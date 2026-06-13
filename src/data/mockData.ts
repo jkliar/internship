@@ -21,6 +21,20 @@ export const INITIAL_PROFESSORS: Professor[] = [
 
 export const INITIAL_COMPANIES: Company[] = [
   {
+    id: 'comp-mongdang',
+    name: '(주)몽당소프트',
+    email: 'company@mongdang.com',
+    businessId: '123-45-67890',
+    website: 'https://mongdang.com',
+    description: '대학 우수인재 매칭 및 보안 위조방지 인증 특화 기업 솔루션을 설계 제작하는 지능형 선발 유니콘 기업입니다.',
+    industry: '보안 및 스마트 솔루션',
+    address: '서울특별시 서초구 반포대로 15',
+    verificationStatus: 'VERIFIED',
+    logoUrl: '✏️',
+    verifiedAt: '2026-06-12T09:00:00Z',
+    createdAt: '2026-06-11T12:00:00Z'
+  },
+  {
     id: 'comp-naver',
     name: '(주)네오소프트',
     email: 'talent@neosoft.com',
@@ -51,6 +65,24 @@ export const INITIAL_COMPANIES: Company[] = [
 ];
 
 export const INITIAL_STUDENTS: Student[] = [
+  {
+    id: 'stud-intern',
+    name: '홍인턴',
+    email: 'intern@mongdang.com',
+    university: '서울대학교',
+    major: '컴퓨터개발학부',
+    resume: {
+      bio: '실무형 인턴십 매칭 플랫폼 몽당(Mongdang)의 테스트 공식 1호 대표 학우입니다. 주도적 자가 성장 및 협업형 소통 역량이 우수합니다.',
+      skills: ['React', 'Next.js', 'TypeScript', 'Node.js', 'Figma'],
+      education: '서울대학교 컴퓨터공학과 3학년 재학 중',
+      experience: '교외 정보보안 경진대회 장려상 수상\n오픈소스 커뮤니티 정기 기여',
+      projects: '1. 교내 출결 점검 프록시 연계 모듈\n2. AI 회고록 비전 트래킹'
+    },
+    recommendationStatus: 'PENDING',
+    requestedProfessorName: '김태진 교수',
+    requestedProfessorEmail: 'tjkim@sejong.ac.kr',
+    createdAt: '2026-06-13T08:00:00Z'
+  },
   {
     id: 'stud-minsoo',
     name: '강민수',

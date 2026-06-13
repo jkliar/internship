@@ -108,9 +108,27 @@ export default function App() {
       if (saved) {
         try {
           const parsed = JSON.parse(saved);
-          defaultStudents = parsed.students || INITIAL_STUDENTS;
-          defaultProfessors = parsed.professors || INITIAL_PROFESSORS;
-          defaultCompanies = parsed.companies || INITIAL_COMPANIES;
+          let loadedStudents = parsed.students || INITIAL_STUDENTS;
+          let loadedProfessors = parsed.professors || INITIAL_PROFESSORS;
+          let loadedCompanies = parsed.companies || INITIAL_COMPANIES;
+
+          // Merge safety: Ensure newly introduced demo accounts are always present in the test pool
+          if (!loadedStudents.some(s => s.id === 'stud-intern')) {
+            const internAccount = INITIAL_STUDENTS.find(s => s.id === 'stud-intern');
+            if (internAccount) {
+              loadedStudents = [internAccount, ...loadedStudents];
+            }
+          }
+          if (!loadedCompanies.some(c => c.id === 'comp-mongdang')) {
+            const companyAccount = INITIAL_COMPANIES.find(c => c.id === 'comp-mongdang');
+            if (companyAccount) {
+              loadedCompanies = [companyAccount, ...loadedCompanies];
+            }
+          }
+
+          defaultStudents = loadedStudents;
+          defaultProfessors = loadedProfessors;
+          defaultCompanies = loadedCompanies;
           defaultRecommendations = parsed.recommendations || INITIAL_RECOMMENDATIONS;
           defaultRecommendationCodes = parsed.recommendationCodes || INITIAL_RECOMMENDATION_CODES;
           defaultJobs = parsed.jobs || INITIAL_JOBS;

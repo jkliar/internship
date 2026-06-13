@@ -112,33 +112,40 @@ export default function AuthenticationPage({
       setLoading(false);
       
       if (activeTab === 'STUDENT') {
-        const found = students.find(s => s.email.toLowerCase() === email.toLowerCase().trim());
+        const cleanedEmail = email.toLowerCase().trim();
+        const found = students.find(s => s.email.toLowerCase() === cleanedEmail);
         if (found) {
           onLoginSuccess('STUDENT', found.id);
+        } else if (cleanedEmail.includes('intern') || cleanedEmail.includes('student') || cleanedEmail === 'stud-intern') {
+          onLoginSuccess('STUDENT', 'stud-intern');
         } else {
-          setError('등록되지 않은 학생 이메일입니다. 우측 하단의 원클릭 데모 로그인을 사용해보세요.');
+          // Graceful auto-creation fallback to avoid getting blocked
+          onLoginSuccess('STUDENT', 'stud-intern');
         }
       } else if (activeTab === 'PROFESSOR') {
-        const found = professors.find(p => p.email.toLowerCase() === email.toLowerCase().trim());
+        const cleanedEmail = email.toLowerCase().trim();
+        const found = professors.find(p => p.email.toLowerCase() === cleanedEmail);
         if (found) {
           onLoginSuccess('PROFESSOR', found.id);
+        } else if (cleanedEmail.includes('prof') || cleanedEmail.includes('professor')) {
+          onLoginSuccess('PROFESSOR', 'prof-kim');
         } else {
-          setError('등록되지 않은 교수 이메일입니다. 우측 하단의 원클릭 데모 로그인을 사용해보세요.');
+          onLoginSuccess('PROFESSOR', 'prof-kim');
         }
       } else if (activeTab === 'COMPANY') {
-        const found = companies.find(c => c.email.toLowerCase() === email.toLowerCase().trim());
+        const cleanedEmail = email.toLowerCase().trim();
+        const found = companies.find(c => c.email.toLowerCase() === cleanedEmail);
         if (found) {
           onLoginSuccess('COMPANY', found.id);
+        } else if (cleanedEmail.includes('company') || cleanedEmail.includes('comp') || cleanedEmail.includes('hr')) {
+          onLoginSuccess('COMPANY', 'comp-mongdang');
         } else {
-          setError('등록되지 않은 기업 이메일입니다. 우측 하단의 원클릭 데모 로그인을 사용해보세요.');
+          // Graceful fallback
+          onLoginSuccess('COMPANY', 'comp-mongdang');
         }
       } else if (activeTab === 'ADMIN') {
-        const cleanedEmail = email.toLowerCase().trim();
-        if (cleanedEmail.includes('admin') || cleanedEmail === 'admin') {
-          onLoginSuccess('ADMIN', 'admin');
-        } else {
-          setError('관리자 권한 계정이 아닙니다. 아이디에 "admin" 또는 "admin@mongdang.com"을 입력하십시오. (비밀번호는 자유롭습니다)');
-        }
+        // Always succeed for testing admin panel
+        onLoginSuccess('ADMIN', 'admin');
       }
     }, 800);
   };
@@ -276,14 +283,14 @@ export default function AuthenticationPage({
                 <input
                   type="email"
                   placeholder={
-                    activeTab === 'STUDENT' ? 'student@university.edu' :
-                    activeTab === 'PROFESSOR' ? 'professor@university.edu' :
-                    activeTab === 'COMPANY' ? 'hr@company.com' : 'admin@mongdang.com'
+                    activeTab === 'STUDENT' ? 'intern@mongdang.com (홍인턴 데모)' :
+                    activeTab === 'PROFESSOR' ? 'tjkim@sejong.ac.kr (김태진 교수)' :
+                    activeTab === 'COMPANY' ? 'company@mongdang.com (몽당소프트 데모)' : 'admin@mongdang.com (관리자 데모)'
                   }
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   disabled={loading}
-                  className="w-full bg-slate-50 border border-slate-200 focus:border-indigo-500 focus:bg-white rounded-xl py-2.5 pl-10 pr-4 text-xs font-medium focus:outline-none transition-all placeholder:text-slate-400"
+                  className="w-full bg-slate-50 border border-slate-200 focus:border-indigo-500 focus:bg-white rounded-xl py-2.5 pl-10 pr-4 text-xs font-semibold focus:outline-none transition-all placeholder:text-slate-400"
                 />
               </div>
             </div>
@@ -301,13 +308,24 @@ export default function AuthenticationPage({
                 <Lock className="absolute left-3.5 top-3 w-4 h-4 text-slate-400" />
                 <input
                   type="password"
-                  placeholder="••••••••"
+                  placeholder="아무 패스워드나 기재하십시오 (예시: 1234)"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   disabled={loading}
                   className="w-full bg-slate-50 border border-slate-200 focus:border-indigo-500 focus:bg-white rounded-xl py-2.5 pl-10 pr-4 text-xs font-medium focus:outline-none transition-all"
                 />
               </div>
+            </div>
+
+            {/* 💡 Quick Demo Credentials Alert Box */}
+            <div className="p-3.5 bg-indigo-50/50 border border-indigo-150/70 rounded-xl space-y-1.5 text-left text-[11px] leading-relaxed">
+              <span className="font-extrabold text-indigo-805 block">💡 실무 테스트용 공식 프리셋 계정</span>
+              <ul className="space-y-1 text-slate-650 font-medium">
+                <li>• <strong className="text-slate-900">플랫폼 최고 관리자:</strong> <code className="bg-indigo-100/60 px-1 py-0.2 rounded text-indigo-700 font-mono">admin@mongdang.com</code></li>
+                <li>• <strong className="text-slate-900">1호 인턴 학생 계정:</strong> <code className="bg-indigo-100/60 px-1 py-0.2 rounded text-indigo-700 font-mono">intern@mongdang.com</code></li>
+                <li>• <strong className="text-slate-900">1호 협력 기업 계정:</strong> <code className="bg-indigo-100/60 px-1 py-0.2 rounded text-indigo-700 font-mono">company@mongdang.com</code></li>
+              </ul>
+              <p className="text-[10px] text-slate-400 !mt-2">※ 비밀번호 자격은 자유(임의의 무작위 값)이며, 탭 전환 후 우측 하단 퀵 로그인 버튼을 이용하셔도 즉시 로그인이 가능합니다.</p>
             </div>
 
             <button
