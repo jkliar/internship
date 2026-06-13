@@ -1,0 +1,6 @@
+{
+  "name": "Academic Internship Matcher",
+  "description": "지도교수 추천서 기반 학생 가입 및 인증된 기업 전용 매칭 플랫폼",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
