@@ -133,10 +133,11 @@ export default function AuthenticationPage({
           setError('등록되지 않은 기업 이메일입니다. 우측 하단의 원클릭 데모 로그인을 사용해보세요.');
         }
       } else if (activeTab === 'ADMIN') {
-        if (email.toLowerCase().trim() === 'admin@hibrain.net' || email.toLowerCase().trim() === 'admin@academia.edu') {
+        const cleanedEmail = email.toLowerCase().trim();
+        if (cleanedEmail.includes('admin') || cleanedEmail === 'admin') {
           onLoginSuccess('ADMIN', 'admin');
         } else {
-          setError('관리자 권한 계정이 아닙니다. 비밀번호는 자유롭습니다.');
+          setError('관리자 권한 계정이 아닙니다. 아이디에 "admin" 또는 "admin@mongdang.com"을 입력하십시오. (비밀번호는 자유롭습니다)');
         }
       }
     }, 800);
@@ -277,7 +278,7 @@ export default function AuthenticationPage({
                   placeholder={
                     activeTab === 'STUDENT' ? 'student@university.edu' :
                     activeTab === 'PROFESSOR' ? 'professor@university.edu' :
-                    activeTab === 'COMPANY' ? 'hr@company.com' : 'admin@hibrain.net'
+                    activeTab === 'COMPANY' ? 'hr@company.com' : 'admin@mongdang.com'
                   }
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -345,7 +346,7 @@ export default function AuthenticationPage({
             </div>
             <div>
               <h4 className="text-xs font-extrabold text-slate-800">심층 원클릭 데모 포탈 (데모 전용)</h4>
-              <p className="text-[10px] text-slate-400">교수 서명 발급 및 매칭 계약 결제 흐름 테스트를 위해 원하는 계정을 즉시 로드합니다.</p>
+              <p className="text-[10px] text-slate-405">교수 서명 발급 및 매칭 계약 결제 흐름 테스트를 위해 원하는 계정을 즉시 로드합니다.</p>
             </div>
           </div>
 
@@ -400,7 +401,7 @@ export default function AuthenticationPage({
                 ))}
 
                 <button
-                  onClick={() => handleQuickLogin('ADMIN', 'admin', 'admin@hibrain.net')}
+                  onClick={() => handleQuickLogin('ADMIN', 'admin', 'admin@mongdang.com')}
                   className="w-full text-left text-[11px] p-1.5 rounded-lg hover:bg-slate-50 border border-transparent hover:border-slate-200 transition font-semibold text-amber-700 flex items-center justify-between block"
                 >
                   <span>💻 플랫폼 총괄 관리자</span>
