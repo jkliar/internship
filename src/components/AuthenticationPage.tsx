@@ -178,7 +178,7 @@ export default function AuthenticationPage({
             <span>국세청 사업자 번호 연동 기업 신원 보증</span>
           </div>
           <div className="mt-4 pt-2 text-[10.5px] text-slate-500">
-            © 2026 TEEDLAB Matcher Hub. All security credentials active.
+            © 2026 Mongdang Matcher Hub. All security credentials active.
           </div>
         </div>
       </div>

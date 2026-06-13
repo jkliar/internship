@@ -687,10 +687,10 @@ export default function App() {
             <div className="flex items-center gap-2.5 cursor-pointer" onClick={() => setCurrentTab('HOME')}>
               <div className="bg-slate-900 text-white p-2 sm:p-2.5 rounded-xl font-black tracking-tight text-xs sm:text-sm select-none shadow-md shadow-slate-900/10 flex items-center gap-1.5 border border-slate-700">
                 <Sparkles className="w-4 h-4 text-amber-300 animate-pulse" />
-                <span>TEEDLAB Matcher Hub</span>
+                <span>Mongdang Matcher Hub</span>
               </div>
               <div className="hidden md:block flex-col align-left text-left">
-                <span className="text-[10px] font-extrabold text-indigo-650 bg-indigo-50 px-2 py-0.5 rounded-md uppercase tracking-wider block">TEEDLAB Academic Matcher</span>
+                <span className="text-[10px] font-extrabold text-indigo-650 bg-indigo-50 px-2 py-0.5 rounded-md uppercase tracking-wider block">Mongdang Academic Matcher</span>
                 <span className="text-[9px] text-slate-404 block -mt-0.5">교수 학술 추천 및 공식 매칭 플랫폼</span>
               </div>
             </div>
@@ -707,26 +707,35 @@ export default function App() {
               >
                 🏠 매칭스퀘어 홈
               </button>
-              <button
-                onClick={() => setCurrentTab('JOBS')}
-                className={`px-3.5 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
-                  currentTab === 'JOBS'
-                    ? 'bg-slate-100 text-slate-900 border border-slate-200/40'
-                    : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50 border border-transparent'
-                }`}
-              >
-                💼 인턴 채용공고
-              </button>
-              <button
-                onClick={() => setCurrentTab('SCHOLARS')}
-                className={`px-3.5 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
-                  currentTab === 'SCHOLARS'
-                    ? 'bg-slate-100 text-slate-900 border border-slate-200/40'
-                    : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50 border border-transparent'
-                }`}
-              >
-                🎓 학술 추천 우수인재
-              </button>
+              
+              {/* STUDENT or UNLOGGED Dynamic View */}
+              {(!isLoggedIn || currentRole === 'STUDENT') && (
+                <button
+                  onClick={() => setCurrentTab('JOBS')}
+                  className={`px-3.5 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                    currentTab === 'JOBS'
+                      ? 'bg-slate-100 text-slate-900 border border-slate-200/40'
+                      : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50 border border-transparent'
+                  }`}
+                >
+                  💼 인턴 채용공고
+                </button>
+              )}
+
+              {/* COMPANY / ADMIN / PROFESSOR / UNLOGGED Scholars View */}
+              {(!isLoggedIn || currentRole === 'COMPANY' || currentRole === 'ADMIN' || currentRole === 'PROFESSOR') && (
+                <button
+                  onClick={() => setCurrentTab('SCHOLARS')}
+                  className={`px-3.5 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                    currentTab === 'SCHOLARS'
+                      ? 'bg-slate-100 text-slate-900 border border-slate-200/40'
+                      : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50 border border-transparent'
+                  }`}
+                >
+                  🎓 학술 추천 우수인재
+                </button>
+              )}
+
               <button
                 onClick={() => setCurrentTab('GUIDE')}
                 className={`px-3.5 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
@@ -840,12 +849,12 @@ export default function App() {
                     {sbSyncError || missingTables.length > 0 ? (
                       <>
                         <span className="inline-flex w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse"></span>
-                        <span>[TEEDLAB] Supabase 테이블 생성 및 동기화 대기 중</span>
+                        <span>[Mongdang] Supabase 테이블 생성 및 동기화 대기 중</span>
                       </>
                     ) : (
                       <>
                         <span className="inline-flex w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
-                        <span>[TEEDLAB] Supabase 실시간 클라우드 DB 연동 완료</span>
+                        <span>[Mongdang] Supabase 실시간 클라우드 DB 연동 완료</span>
                       </>
                     )}
                   </h4>
@@ -911,7 +920,7 @@ export default function App() {
               </div>
 
               <div className="mt-5 pt-4 border-t border-slate-150 flex items-center justify-between text-xs">
-                <span className="text-slate-450 font-semibold text-slate-500">티드랩(TEEDLAB) 매칭 서비스 전용 통합 스키마</span>
+                <span className="text-slate-450 font-semibold text-slate-500">Mongdang 매칭 서비스 전용 통합 스키마</span>
                 <button
                   onClick={() => setShowSqlDialog(false)}
                   className="bg-slate-900 hover:bg-slate-800 text-white font-bold px-5 py-2.5 rounded-xl cursor-pointer"
@@ -1041,7 +1050,7 @@ export default function App() {
                   </p>
                 </div>
                 <div className="bg-white/5 p-4 rounded-xl border border-white/5 space-y-2 text-xs">
-                  <span className="font-bold text-indigo-300 block">💡 성과 보증 전산화 흐름도</span>
+                  <span className="font-bold text-indigo-305 block">💡 성과 보증 전산화 흐름도</span>
                   <p className="text-[10.5px] text-slate-400 leading-normal">
                     1. <strong>가입/로그인</strong> 완료 후 마이 대시보드에서 담당 지도교수 추천을 요청하거나 오프라인 수령한 <strong>난수 토큰</strong>을 즉시 활성화하십시오.
                   </p>
@@ -1053,82 +1062,102 @@ export default function App() {
 
         {/* 4. ISOLATED SCHOLARS DIRECTORY TAB */}
         {currentTab === 'SCHOLARS' && (
-          <div className="space-y-6">
-            <div className="text-center max-w-2xl mx-auto py-4 space-y-2">
-              <h1 className="text-xl sm:text-2xl font-black text-slate-950 tracking-tight">🎓 대학 추천 대표인재 (Scholars Registry)</h1>
-              <p className="text-xs text-slate-500 font-medium">부정 지원을 근절하기 위해 소속 대학교수진의 실명 보증 디지털 날인이 완결 등재된 우수 학생 명단입니다.</p>
+          isLoggedIn && currentRole === 'STUDENT' ? (
+            <div className="bg-white border border-slate-200 p-8 sm:p-12 rounded-3xl text-center max-w-xl mx-auto space-y-4 my-12 shadow-3xs">
+              <div className="w-16 h-16 bg-rose-50 text-rose-605 rounded-2xl flex items-center justify-center mx-auto border border-rose-100 text-rose-600">
+                <ShieldCheck className="w-8 h-8" />
+              </div>
+              <h2 className="text-lg font-black text-slate-900 tracking-tight">🔒 학외 성과우수 위조열람 제한</h2>
+              <p className="text-xs text-slate-500 leading-relaxed font-semibold">
+                Mongdang 보안 수칙 및 개인정보보호법에 의거하여, 학생/인턴 회원은 타 아카데미 학우들의 학과 성과 보증 추천서 및 상세 이력 정보를 조회할 권한이 엄격히 통제(Read-Restricted)되어 있습니다.
+              </p>
+              <div className="pt-2">
+                <button
+                  onClick={() => setCurrentTab('DASHBOARD')}
+                  className="bg-slate-950 hover:bg-slate-900 text-white font-extrabold text-xs px-5 py-3 rounded-xl cursor-pointer shadow-sm transition duration-150 inline-flex items-center gap-2"
+                >
+                  나의 학생 전용 페이지로 이동 <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
             </div>
+          ) : (
+            <div className="space-y-6">
+              <div className="text-center max-w-2xl mx-auto py-4 space-y-2">
+                <h1 className="text-xl sm:text-2xl font-black text-slate-950 tracking-tight">🎓 대학 추천 대표인재 (Scholars Registry)</h1>
+                <p className="text-xs text-slate-500 font-medium">부정 지원을 근절하기 위해 소속 대학교수진의 실명 보증 디지털 날인이 완결 등재된 우수 학생 명단입니다.</p>
+              </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {students.map(s => {
-                const verifiedReco = recommendations.find(r => r.studentEmail === s.email && r.status === 'APPROVED');
-                return (
-                  <div key={s.id} className="bg-white border border-slate-200 rounded-2xl p-5 hover:border-slate-300 hover:shadow-xs transition relative flex flex-col justify-between space-y-4 text-left">
-                    <div>
-                      {/* ID Indicator */}
-                      <div className="flex justify-between items-center mb-3">
-                        <span className="text-[9px] font-mono text-indigo-650 font-bold bg-indigo-50/40 px-2 py-0.5 rounded">ID: {s.id.toUpperCase()}</span>
-                        <span className={`text-[9.5px] font-black px-2 py-0.5 rounded-full ${
-                          s.recommendationStatus === 'VERIFIED' 
-                            ? 'bg-emerald-50 text-emerald-800 border border-emerald-100/60' 
-                            : 'bg-amber-50 text-amber-600 border border-amber-100/60'
-                        }`}>
-                          {s.recommendationStatus === 'VERIFIED' ? '● 성과보증완료' : '● 소견대기'}
-                        </span>
-                      </div>
-
-                      {/* Basic Info */}
-                      <div className="space-y-0.5">
-                        <h4 className="text-sm font-extrabold text-slate-900 flex items-center gap-1.5 flex-wrap">
-                          <span>{s.name.substring(0,1)}*{(s.name.length > 2) ? s.name.substring(2) : '원'} 학우</span>
-                          <span className="text-[10px] text-slate-400 font-semibold bg-slate-100 px-1.5 py-0.2 rounded-md">({s.major})</span>
-                        </h4>
-                        <p className="text-xs text-slate-500 font-bold">{s.university}</p>
-                      </div>
-
-                      {/* BIO snippet */}
-                      <p className="text-xs text-slate-600 mt-3 bg-slate-50 p-2.5 rounded-lg border border-slate-100 block max-h-24 overflow-y-auto leading-relaxed">
-                        {s.resume.bio || "미구현 이력 사항"}
-                      </p>
-
-                      {/* Verified Instructor review */}
-                      {verifiedReco ? (
-                        <div className="mt-4 border-l-2 border-indigo-600 pl-2 text-[11px] text-slate-500 space-y-0.5">
-                          <span className="font-extrabold text-slate-700 block">👨‍🏫 추천인 {verifiedReco.professorName} 소견:</span>
-                          <p className="italic leading-normal text-slate-600 font-serif">"{verifiedReco.content}"</p>
-                        </div>
-                      ) : (
-                        <div className="mt-4 text-[10.5px] text-slate-400/90 flex items-center gap-1 font-medium bg-amber-50/30 p-2 rounded-lg border border-amber-500/10">
-                          <span>⚠️ 학술 검증 진행 (스승의 추천 소견 서명 기립 대기 중)</span>
-                        </div>
-                      )}
-                    </div>
-
-                    <div>
-                      {/* Skill Badges */}
-                      <div className="flex flex-wrap gap-1 pt-3 border-t border-slate-100">
-                        {s.resume.skills.slice(0, 4).map((skill, i) => (
-                          <span key={i} className="text-[8.5px] font-extrabold bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded-md font-mono">
-                            {skill}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {students.map(s => {
+                  const verifiedReco = recommendations.find(r => r.studentEmail === s.email && r.status === 'APPROVED');
+                  return (
+                    <div key={s.id} className="bg-white border border-slate-200 rounded-2xl p-5 hover:border-slate-300 hover:shadow-xs transition relative flex flex-col justify-between space-y-4 text-left">
+                      <div>
+                        {/* ID Indicator */}
+                        <div className="flex justify-between items-center mb-3">
+                          <span className="text-[9px] font-mono text-indigo-650 font-bold bg-indigo-50/40 px-2 py-0.5 rounded">ID: {s.id.toUpperCase()}</span>
+                          <span className={`text-[9.5px] font-black px-2 py-0.5 rounded-full ${
+                            s.recommendationStatus === 'VERIFIED' 
+                              ? 'bg-emerald-50 text-emerald-800 border border-emerald-100/60' 
+                              : 'bg-amber-50 text-amber-600 border border-amber-100/60'
+                          }`}>
+                            {s.recommendationStatus === 'VERIFIED' ? '● 성과보증완료' : '● 소견대기'}
                           </span>
-                        ))}
-                      </div>
+                        </div>
 
-                      {/* Application trigger helper */}
-                      <div className="pt-3 flex justify-between items-center text-[10px] text-slate-400 font-medium pb-1">
-                        <span>등재일 {s.createdAt.substring(0, 10)}</span>
-                        {s.recommendationStatus === 'VERIFIED' ? (
-                          <span className="text-emerald-700 font-extrabold">인턴십 배치 대상 활성</span>
+                        {/* Basic Info */}
+                        <div className="space-y-0.5">
+                          <h4 className="text-sm font-extrabold text-slate-900 flex items-center gap-1.5 flex-wrap">
+                            <span>{s.name.substring(0,1)}*{(s.name.length > 2) ? s.name.substring(2) : '원'} 학우</span>
+                            <span className="text-[10px] text-slate-400 font-semibold bg-slate-100 px-1.5 py-0.2 rounded-md">({s.major})</span>
+                          </h4>
+                          <p className="text-xs text-slate-500 font-bold">{s.university}</p>
+                        </div>
+
+                        {/* BIO snippet */}
+                        <p className="text-xs text-slate-600 mt-3 bg-slate-50 p-2.5 rounded-lg border border-slate-100 block max-h-24 overflow-y-auto leading-relaxed">
+                          {s.resume.bio || "미구현 이력 사항"}
+                        </p>
+
+                        {/* Verified Instructor review */}
+                        {verifiedReco ? (
+                          <div className="mt-4 border-l-2 border-indigo-600 pl-2 text-[11px] text-slate-500 space-y-0.5">
+                            <span className="font-extrabold text-slate-700 block">👨‍🏫 추천인 {verifiedReco.professorName} 소견:</span>
+                            <p className="italic leading-normal text-slate-600 font-serif">"{verifiedReco.content}"</p>
+                          </div>
                         ) : (
-                          <span className="text-amber-600 font-extrabold">검증 심사 중</span>
+                          <div className="mt-4 text-[10.5px] text-slate-400/90 flex items-center gap-1 font-medium bg-amber-50/30 p-2 rounded-lg border border-amber-500/10">
+                            <span>⚠️ 학술 검증 진행 (스승의 추천 소견 서명 기립 대기 중)</span>
+                          </div>
                         )}
                       </div>
+
+                      <div>
+                        {/* Skill Badges */}
+                        <div className="flex flex-wrap gap-1 pt-3 border-t border-slate-100">
+                          {s.resume.skills.slice(0, 4).map((skill, i) => (
+                            <span key={i} className="text-[8.5px] font-extrabold bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded-md font-mono">
+                              {skill}
+                            </span>
+                          ))}
+                        </div>
+
+                        {/* Application trigger helper */}
+                        <div className="pt-3 flex justify-between items-center text-[10px] text-slate-400 font-medium pb-1">
+                          <span>등재일 {s.createdAt.substring(0, 10)}</span>
+                          {s.recommendationStatus === 'VERIFIED' ? (
+                            <span className="text-emerald-700 font-extrabold">인턴십 배치 대상 활성</span>
+                          ) : (
+                            <span className="text-amber-600 font-extrabold">검증 심사 중</span>
+                          )}
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                );
-              })}
+                  );
+                })}
+              </div>
             </div>
-          </div>
+          )
         )}
 
         {/* 5. SCENARIO GUIDE WALKTHROUGH */}
@@ -1283,9 +1312,18 @@ export default function App() {
       {/* Footer credit section conforming to humble literals */}
       <footer className="bg-white border-t border-slate-200 py-6 text-center text-xs text-slate-400 mt-20">
         <div className="max-w-7xl mx-auto px-4 space-y-1.5 font-medium">
-          <p className="font-extrabold text-slate-800">TEEDLAB Academic Matcher Platform</p>
-          <p className="text-[10.5px] text-indigo-600 font-semibold font-mono">Developed & Operated by TEEDLAB (티드랩) | All Rights Reserved</p>
-          <p className="text-[10px] text-slate-405">지도교수 추천 인재 매칭 및 보안 기업 심사 검증 관리 시스템 © 2026 TEEDLAB</p>
+          {currentTab === 'HOME' ? (
+            <>
+              <p className="font-extrabold text-slate-800">Mongdang Platform</p>
+              <p className="text-[10.5px] text-indigo-600 font-semibold font-mono">Developed & Operated by TEEDLAB | All Rights Reserved</p>
+              <p className="text-[10px] text-slate-405">지도교수 추천 인재 매칭 및 보안 기업 심사 검증 관리 시스템 © 2026 TEEDLAB</p>
+            </>
+          ) : (
+            <>
+              <p className="font-extrabold text-slate-800">Mongdang Platform</p>
+              <p className="text-[10px] text-slate-405">지도교수 추천 인재 매칭 및 보안 기업 심사 검증 관리 시스템 © 2026 Mongdang</p>
+            </>
+          )}
         </div>
       </footer>
     </div>

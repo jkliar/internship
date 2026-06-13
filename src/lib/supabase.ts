@@ -571,7 +571,7 @@ export async function saveApplicationToSupabase(app: JobApplication): Promise<bo
 
 // Copyable SQL setup statements
 export const SUPABASE_SQL_DDL_SCRIPT = `-- ==========================================
--- TEEDLAB Academic Matcher - Database Schema
+-- Mongdang - Database Schema
 -- ==========================================
 
 -- 1. Create Students Table
