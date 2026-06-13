@@ -31,6 +31,7 @@ import CompanyDashboard from './components/CompanyDashboard';
 import AdminDashboard from './components/AdminDashboard';
 import SignUpSimulator from './components/SignUpSimulator';
 import AcademicHome from './components/AcademicHome';
+import AuthenticationPage from './components/AuthenticationPage';
 import { 
   Sparkles, 
   HelpCircle, 
@@ -38,7 +39,16 @@ import {
   ArrowRight, 
   ShieldCheck, 
   Globe, 
-  Users2 
+  Users2,
+  LogIn,
+  LogOut,
+  User,
+  Menu,
+  X,
+  FileCheck,
+  Building2,
+  Fingerprint,
+  RotateCcw
 } from 'lucide-react';
 
 const STORAGE_KEY = 'academic_internship_db_v1';
@@ -56,7 +66,10 @@ export default function App() {
   // Demo active sessions
   const [currentRole, setCurrentRole] = useState<UserRole>('STUDENT');
   const [currentActorId, setCurrentActorId] = useState<string>('stud-jiwon'); // Target pending student initially
-  const [currentTab, setCurrentTab] = useState<'HOME' | 'WORKBENCH'>('HOME');
+  
+  // Real-world state parameters
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+  const [currentTab, setCurrentTab] = useState<'HOME' | 'JOBS' | 'SCHOLARS' | 'GUIDE' | 'LOGIN' | 'DASHBOARD'>('HOME');
 
   // SignUp dialog trigger
   const [showSignUpDialog, setShowSignUpDialog] = useState(false);
@@ -118,6 +131,8 @@ export default function App() {
     // Default actor roles
     setCurrentRole('STUDENT');
     setCurrentActorId('stud-jiwon');
+    setIsLoggedIn(false);
+    setCurrentTab('HOME');
 
     const state = {
       students: INITIAL_STUDENTS,
@@ -135,6 +150,8 @@ export default function App() {
   const handleActorChange = (role: UserRole, actorId: string) => {
     setCurrentRole(role);
     setCurrentActorId(actorId);
+    setIsLoggedIn(true);
+    setCurrentTab('DASHBOARD');
   };
 
   // 1. STUDENT EVENT ACTION HANDLERS
@@ -567,20 +584,148 @@ export default function App() {
   const activeProfessor = professors.find(p => p.id === currentActorId);
   const activeCompany = companies.find(c => c.id === currentActorId);
 
+  const [isDevSwapperOpen, setIsDevSwapperOpen] = useState(false);
+
   return (
-    <div className="min-h-screen bg-[#f8fafc] text-slate-800 flex flex-col font-sans">
+    <div className="min-h-screen bg-[#f8fafc] text-slate-800 flex flex-col font-sans relative">
       
-      {/* Upper Floating Developer Role Bar */}
-      <RoleSwitcher
-        currentRole={currentRole}
-        currentActorId={currentActorId}
-        students={students}
-        professors={professors}
-        companies={companies}
-        onActorChange={handleActorChange}
-        onResetData={resetToDefaults}
-        onOpenSignUpTrigger={() => setShowSignUpDialog(true)}
-      />
+      {/* 📍 REAL WORLD PRODUCTION NAV BAR */}
+      <nav className="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-xs">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between h-16 items-center">
+            
+            {/* Platform Logo */}
+            <div className="flex items-center gap-2.5 cursor-pointer" onClick={() => setCurrentTab('HOME')}>
+              <div className="bg-indigo-650 text-white p-2 sm:p-2.5 rounded-xl font-black tracking-tight text-xs sm:text-sm select-none shadow-md shadow-indigo-600/10 flex items-center gap-1.5">
+                <Sparkles className="w-4 h-4 text-amber-300 animate-pulse" />
+                <span>Hibrain Matcher Hub</span>
+              </div>
+              <div className="hidden md:block flex-col align-left text-left">
+                <span className="text-[10px] font-extrabold text-indigo-650 bg-indigo-50 px-2 py-0.5 rounded-md uppercase tracking-wider block">Academic Matching</span>
+                <span className="text-[9px] text-slate-404 block -mt-0.5">교수 추천 및 기업 인증 채용 플랫폼</span>
+              </div>
+            </div>
+
+            {/* Center Navigation Links */}
+            <div className="hidden md:flex items-center gap-1">
+              <button
+                onClick={() => setCurrentTab('HOME')}
+                className={`px-3.5 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                  currentTab === 'HOME'
+                    ? 'bg-slate-100 text-slate-900 border border-slate-200/40'
+                    : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50 border border-transparent'
+                }`}
+              >
+                🏠 매칭스퀘어 홈
+              </button>
+              <button
+                onClick={() => setCurrentTab('JOBS')}
+                className={`px-3.5 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                  currentTab === 'JOBS'
+                    ? 'bg-slate-100 text-slate-900 border border-slate-200/40'
+                    : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50 border border-transparent'
+                }`}
+              >
+                💼 인턴 채용공고
+              </button>
+              <button
+                onClick={() => setCurrentTab('SCHOLARS')}
+                className={`px-3.5 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                  currentTab === 'SCHOLARS'
+                    ? 'bg-slate-100 text-slate-900 border border-slate-200/40'
+                    : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50 border border-transparent'
+                }`}
+              >
+                🎓 학술 추천 우수인재
+              </button>
+              <button
+                onClick={() => setCurrentTab('GUIDE')}
+                className={`px-3.5 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                  currentTab === 'GUIDE'
+                    ? 'bg-slate-100 text-slate-900 border border-slate-200/40'
+                    : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50 border border-transparent'
+                }`}
+              >
+                💡 시뮬레이션 가이드
+              </button>
+            </div>
+
+            {/* Right Session actions */}
+            <div className="flex items-center gap-2">
+              {isLoggedIn ? (
+                <div className="flex items-center gap-2">
+                  
+                  {/* Dashboard shortcut tab */}
+                  <button
+                    onClick={() => setCurrentTab('DASHBOARD')}
+                    className={`px-3.5 py-2 text-xs font-bold rounded-xl border transition-all flex items-center gap-1.5 cursor-pointer ${
+                      currentTab === 'DASHBOARD'
+                        ? 'bg-slate-900 text-white border-slate-905 shadow-sm'
+                        : 'bg-indigo-50 text-indigo-700 border-indigo-100 hover:bg-indigo-100'
+                    }`}
+                  >
+                    <span>⚙️ {currentRole === 'STUDENT' ? '학생' : currentRole === 'PROFESSOR' ? '교수' : currentRole === 'COMPANY' ? '기업' : '관리자'} 대시보드</span>
+                  </button>
+
+                  {/* Profile Indicator */}
+                  <div className="hidden sm:flex flex-col items-end text-right mr-1">
+                    <span className="text-[9px] text-slate-400 font-bold leading-none mb-0.5">인증세션</span>
+                    <span className="text-xs font-extrabold text-slate-700">
+                      {currentRole === 'STUDENT' && (students.find(s => s.id === currentActorId)?.name || '학생 학학우')}
+                      {currentRole === 'PROFESSOR' && (professors.find(p => p.id === currentActorId)?.name || '교수')}
+                      {currentRole === 'COMPANY' && (companies.find(c => c.id === currentActorId)?.name || '회사인사팀')}
+                      {currentRole === 'ADMIN' && '아카이브 관리자'}
+                    </span>
+                  </div>
+
+                  {/* Logout button */}
+                  <button
+                    onClick={() => {
+                      setIsLoggedIn(false);
+                      setCurrentTab('HOME');
+                    }}
+                    className="p-2 text-slate-400 hover:text-rose-500 rounded-lg hover:bg-rose-50 transition cursor-pointer"
+                    title="로그아웃"
+                  >
+                    <LogOut className="w-4 h-4" />
+                  </button>
+                </div>
+              ) : (
+                <div className="flex items-center gap-1.5">
+                  <button
+                    onClick={() => setCurrentTab('LOGIN')}
+                    className="px-3.5 py-2 text-xs font-bold text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-xl transition cursor-pointer"
+                  >
+                    로그인
+                  </button>
+                  <button
+                    onClick={() => setShowSignUpDialog(true)}
+                    className="px-3.5 py-2 text-xs font-bold bg-indigo-650 text-white hover:bg-indigo-600 rounded-xl transition shadow-md shadow-indigo-600/10 cursor-pointer"
+                  >
+                    회원가입
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Mobile Navigation tab bar for small viewports */}
+        <div className="md:hidden flex border-t border-slate-205 justify-around py-2 bg-slate-50 text-[10.5px] font-bold text-slate-500">
+          <button onClick={() => setCurrentTab('HOME')} className={`flex flex-col items-center gap-0.5 ${currentTab === 'HOME' ? 'text-indigo-600' : ''}`}>
+            <span>🏠 홈</span>
+          </button>
+          <button onClick={() => setCurrentTab('JOBS')} className={`flex flex-col items-center gap-0.5 ${currentTab === 'JOBS' ? 'text-indigo-600' : ''}`}>
+            <span>💼 채용공고</span>
+          </button>
+          <button onClick={() => setCurrentTab('SCHOLARS')} className={`flex flex-col items-center gap-0.5 ${currentTab === 'SCHOLARS' ? 'text-indigo-600' : ''}`}>
+            <span>🎓 우수인재</span>
+          </button>
+          <button onClick={() => setCurrentTab('GUIDE')} className={`flex flex-col items-center gap-0.5 ${currentTab === 'GUIDE' ? 'text-indigo-600' : ''}`}>
+            <span>💡 가이드</span>
+          </button>
+        </div>
+      </nav>
 
       {/* Main Content Stage container */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-8 space-y-6">
@@ -598,33 +743,33 @@ export default function App() {
             <div className="flex items-start gap-3">
               <BookOpen className="w-6 h-6 text-indigo-400 mt-0.5 shrink-0" />
               <div className="space-y-3">
-                <div className="space-y-1">
+                <div className="space-y-1 text-left">
                   <h4 className="text-sm font-bold text-slate-200">💡 학술 인턴십 매칭 플랫폼 데모 시나리오 안내 가이드</h4>
                   <p className="text-[11px] text-slate-400 leading-normal">
                     본 서비스는 무분별한 단순 입사 지원을 통제하기 위해 <strong>'교수진의 학술 추천 소견서'</strong> 제출과 <strong>'정부 인증된 공공/민간 기업 신원'</strong>이 가공 대조되어야만 가입과 구인이 원천 작동하게 빌드되었습니다. 아래 제안 흐름을 직접 수행하며 무결성 구조를 검토해 볼 수 있습니다.
                   </p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-5 gap-3 text-[10.5px] leading-relaxed text-slate-300">
+                <div className="grid grid-cols-1 md:grid-cols-5 gap-3 text-[10.5px] leading-relaxed text-slate-300 text-left">
                   <div className="bg-slate-950/40 p-3 rounded-xl border border-slate-850">
                     <span className="font-bold text-indigo-400 block mb-1">1단계: 학생 가입제한</span>
                     기본 선택된 <strong>한지원 학생(대기)</strong>은 추천서가 부재해 공고 접근이 원천 차단됩니다.
                   </div>
                   <div className="bg-slate-950/40 p-3 rounded-xl border border-slate-850">
                     <span className="font-bold text-indigo-400 block mb-1">2단계: 스승 추천 서명</span>
-                    상단에서 <strong>"김태진 교수"</strong>를 선택해 제자 대기란에서 <strong>한지원 님</strong>을 골라 추천서를 작성 및 발송하세요.
+                    하단 레이아웃 우측의 <strong>"모의 스위칭 바"</strong>를 열고 <strong>"김태진 교수"</strong>를 선택해 대기 제자란의 <strong>한지원 님</strong>을 수락 서명해 발송해 주십시오.
                   </div>
                   <div className="bg-slate-950/40 p-3 rounded-xl border border-slate-850">
                     <span className="font-bold text-indigo-400 block mb-1">3단계: 인턴 투입 지원</span>
-                    다시 <strong>한지원 학생</strong>으로 전환하면 차단이 풀려 있습니다. <strong>(주)네오소프트</strong> React 공고에 지원서를 작성 기소하세요!
+                    다시 <strong>한지원 학생</strong>으로 스위치하면 차단 해제를 경험할 수 있습니다. <strong>(주)네오소프트</strong>에 이력서 지원을 투고하십시오!
                   </div>
                   <div className="bg-slate-950/40 p-3 rounded-xl border border-slate-850">
                     <span className="font-bold text-indigo-400 block mb-1">4단계: 기업 합격 인허</span>
-                    <strong>"네오소프트 인사팀"</strong>으로 스위칭해 지원자 탭에서 <strong>김태진 교수 추천 소견서</strong> 대조 검토 후 <strong>오퍼 선발 승인</strong>을 결제하세요.
+                    <strong>"네오소프트 인사팀"</strong>으로 변경하신 뒤, 지원자 전형 탭에서 서류 검토 후 <strong>최종 선발 승인</strong>을 결정해 주십시오.
                   </div>
                   <div className="bg-slate-950/40 p-3 rounded-xl border border-slate-850">
                     <span className="font-bold text-indigo-400 block mb-1">5단계: 심사 대장 확인</span>
-                    <strong>"총괄 관리자(Admin)"</strong> 대장을 열면 완결된 최종 매칭 계약 원장이 세밀하게 등재 완료되어 있습니다.
+                    <strong>"총괄 관리자(Admin)"</strong> 대장을 열면 완결 매칭 서명 대장의 고결 서류 보존 내역이 세목 기록 완료되어 있습니다.
                   </div>
                 </div>
               </div>
@@ -632,38 +777,10 @@ export default function App() {
           </div>
         )}
 
-        {/* 📍 플랫폼 메인 메뉴 네비게이션 */}
-        <div className="flex border-b border-slate-200 gap-2">
-          <button 
-            id="tab-home"
-            onClick={() => setCurrentTab('HOME')}
-            className={`py-3 px-5 text-xs sm:text-sm font-extrabold border-b-2 transition-all cursor-pointer flex items-center gap-1.5 ${
-              currentTab === 'HOME' 
-                ? 'border-indigo-650 text-indigo-700 font-black bg-indigo-50/40 rounded-t-xl' 
-                : 'border-transparent text-slate-500 hover:text-slate-800 hover:border-slate-300'
-            }`}
-          >
-            <Sparkles className="w-4 h-4 text-indigo-600" />
-            <span>🏠 대학-기업 매칭 광장 (메인 홈)</span>
-          </button>
-          
-          <button 
-            id="tab-workbench"
-            onClick={() => setCurrentTab('WORKBENCH')}
-            className={`py-3 px-5 text-xs sm:text-sm font-extrabold border-b-2 transition-all cursor-pointer flex items-center gap-1.5 ${
-              currentTab === 'WORKBENCH' 
-                ? 'border-indigo-650 text-indigo-700 font-black bg-indigo-50/40 rounded-t-xl' 
-                : 'border-transparent text-slate-500 hover:text-slate-800 hover:border-slate-300'
-            }`}
-          >
-            <span>⚙️ 역할별 시뮬레이션 워크벤치</span>
-            <span className="inline-block bg-indigo-100 text-indigo-700 text-[10px] scale-90 px-2 py-0.5 rounded-full font-bold">
-              {currentRole} 시뮬레이터
-            </span>
-          </button>
-        </div>
+        {/* -------------------- ROUTED PAGES CORE -------------------- */}
 
-        {currentTab === 'HOME' ? (
+        {/* 1. INITIAL / LANDING PAGE */}
+        {currentTab === 'HOME' && (
           <AcademicHome
             jobs={jobs}
             students={students}
@@ -672,19 +789,279 @@ export default function App() {
             onSwitchToRole={(role, actorId) => {
               setCurrentRole(role);
               setCurrentActorId(actorId);
-              setCurrentTab('WORKBENCH');
+              setIsLoggedIn(true);
+              setCurrentTab('DASHBOARD');
             }}
             onApplyQuick={(jobId) => {
+              if (!isLoggedIn || currentRole !== 'STUDENT') {
+                alert('공고 지원서 제출을 진행하시려면 학생 계정으로 로그인해 주십시오. 1초 간편 로그인 포탈로 안내합니다.');
+                setCurrentTab('LOGIN');
+                return;
+              }
               handleApplyForJob(jobId);
-              setCurrentTab('WORKBENCH');
+              setCurrentTab('DASHBOARD');
             }}
-            currentRole={currentRole}
-            currentActorId={currentActorId}
+            currentRole={isLoggedIn ? currentRole : 'STUDENT'}
+            currentActorId={isLoggedIn ? currentActorId : ''}
           />
-        ) : (
+        )}
+
+        {/* 2. DEDICATED LOGIN PAGE (With distinct student, company, admin targets) */}
+        {currentTab === 'LOGIN' && (
+          <AuthenticationPage
+            students={students}
+            professors={professors}
+            companies={companies}
+            onLoginSuccess={(role, actorId) => {
+              setCurrentRole(role);
+              setCurrentActorId(actorId);
+              setIsLoggedIn(true);
+              setCurrentTab('DASHBOARD');
+            }}
+            onOpenSignUp={() => setShowSignUpDialog(true)}
+          />
+        )}
+
+        {/* 3. ISOLATED JOBS DIRECTORY TAB */}
+        {currentTab === 'JOBS' && (
           <div className="space-y-6">
-            {/* Dynamic active user layout headers */}
-            <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-2xs flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div className="text-center max-w-2xl mx-auto py-4 space-y-2">
+              <h1 className="text-xl sm:text-2xl font-black text-slate-950 tracking-tight">💼 대학 검증형 우수 인턴십 선발 공고</h1>
+              <p className="text-xs text-slate-500 font-medium">검증 마크가 부착된 각 학술적 신뢰 기업군이 개진한 정규 인턴십 대장 리스트입니다.</p>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+              {/* Job List Panel (7/12) */}
+              <div className="lg:col-span-7 space-y-4">
+                {jobs.map(job => (
+                  <div
+                    key={job.id}
+                    className="bg-white border border-slate-200 rounded-2xl p-5 hover:border-indigo-500 hover:shadow-xs transition duration-200 text-left space-y-3.5"
+                  >
+                    <div className="flex justify-between items-start gap-4">
+                      <div>
+                        <div className="flex items-center gap-1.5 mt-0.5">
+                          <span className="text-xs font-bold text-indigo-650">{job.companyName}</span>
+                          <span className="inline-flex bg-indigo-50 text-indigo-700 text-[9.5px] font-black px-1.5 py-0.2 rounded-sm uppercase">정규인증</span>
+                        </div>
+                        <h4 className="text-sm font-extrabold text-slate-900 mt-1">{job.title}</h4>
+                      </div>
+                      <span className="bg-indigo-50 text-indigo-700 text-[10px] font-bold px-2 py-0.5 rounded-full block text-right shrink-0">
+                        {job.location}
+                      </span>
+                    </div>
+
+                    <p className="text-xs text-slate-600 line-clamp-2 leading-relaxed">{job.description}</p>
+
+                    <div className="flex flex-wrap gap-1">
+                      {job.requirements.slice(0, 3).map((r, idx) => (
+                        <span key={idx} className="bg-slate-105 text-slate-600 text-[9.5px] px-2 py-0.5 rounded-md font-semibold font-mono">
+                          {r}
+                        </span>
+                      ))}
+                    </div>
+
+                    <div className="pt-3 border-t border-slate-100 flex justify-between items-center text-xs">
+                      <span className="text-slate-400 font-bold">인턴보상 {job.salary}</span>
+                      <button
+                        onClick={() => {
+                          if (!isLoggedIn || currentRole !== 'STUDENT') {
+                            alert('공고에 이력서를 직접 전송하려면 학생 계정으로 로그인이 필요합니다. 전산 인증 로그인 창으로 안내합니다.');
+                            setCurrentTab('LOGIN');
+                            return;
+                          }
+                          handleApplyForJob(job.id);
+                          setCurrentTab('DASHBOARD');
+                        }}
+                        className="text-indigo-600 hover:text-indigo-800 font-extrabold flex items-center gap-1 uppercase cursor-pointer"
+                      >
+                        지원서 서명제출 <ArrowRight className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Secure Info Widget Side Card (5/12) */}
+              <div className="lg:col-span-5 bg-gradient-to-b from-indigo-950 to-slate-950 text-white rounded-3xl p-6 border border-slate-800 space-y-5 text-left">
+                <div className="bg-indigo-500/20 w-fit p-2 rounded-xl text-indigo-300">
+                  <ShieldCheck className="w-5 h-5" />
+                </div>
+                <div className="space-y-2">
+                  <h4 className="text-[10px] uppercase tracking-widest font-black text-indigo-400">학업 증명 보증 수칙</h4>
+                  <h2 className="text-md sm:text-lg font-black tracking-tight leading-tight">추천서 인증 우회 및 무결성 구조</h2>
+                  <p className="text-[11px] text-slate-400 leading-relaxed">
+                    본 플랫폼에서는 학생의 지도교수가 서명한 <strong>학계 검증 추천서</strong> 또는 소속 학술기관의 <strong>교수 승인 토큰</strong>이 등재되어 <strong>'인증완료'</strong> 상태로 입증된 우수인재에 한하여 기업 공고 직접 지원서 전송이 작동합니다. 추천이 대기 중인 학생의 서류는 무단 유출되지 않게 원천 차단됩니다.
+                  </p>
+                </div>
+                <div className="bg-white/5 p-4 rounded-xl border border-white/5 space-y-2 text-xs">
+                  <span className="font-bold text-indigo-300 block">💡 성과 보증 전산화 흐름도</span>
+                  <p className="text-[10.5px] text-slate-400 leading-normal">
+                    1. <strong>가입/로그인</strong> 완료 후 마이 대시보드에서 담당 지도교수 추천을 요청하거나 오프라인 수령한 <strong>난수 토큰</strong>을 즉시 활성화하십시오.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* 4. ISOLATED SCHOLARS DIRECTORY TAB */}
+        {currentTab === 'SCHOLARS' && (
+          <div className="space-y-6">
+            <div className="text-center max-w-2xl mx-auto py-4 space-y-2">
+              <h1 className="text-xl sm:text-2xl font-black text-slate-950 tracking-tight">🎓 대학 추천 대표인재 (Scholars Registry)</h1>
+              <p className="text-xs text-slate-500 font-medium">부정 지원을 근절하기 위해 소속 대학교수진의 실명 보증 디지털 날인이 완결 등재된 우수 학생 명단입니다.</p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {students.map(s => {
+                const verifiedReco = recommendations.find(r => r.studentEmail === s.email && r.status === 'APPROVED');
+                return (
+                  <div key={s.id} className="bg-white border border-slate-200 rounded-2xl p-5 hover:border-slate-300 hover:shadow-xs transition relative flex flex-col justify-between space-y-4 text-left">
+                    <div>
+                      {/* ID Indicator */}
+                      <div className="flex justify-between items-center mb-3">
+                        <span className="text-[9px] font-mono text-indigo-650 font-bold bg-indigo-50/40 px-2 py-0.5 rounded">ID: {s.id.toUpperCase()}</span>
+                        <span className={`text-[9.5px] font-black px-2 py-0.5 rounded-full ${
+                          s.recommendationStatus === 'VERIFIED' 
+                            ? 'bg-emerald-50 text-emerald-800 border border-emerald-100/60' 
+                            : 'bg-amber-50 text-amber-600 border border-amber-100/60'
+                        }`}>
+                          {s.recommendationStatus === 'VERIFIED' ? '● 성과보증완료' : '● 소견대기'}
+                        </span>
+                      </div>
+
+                      {/* Basic Info */}
+                      <div className="space-y-0.5">
+                        <h4 className="text-sm font-extrabold text-slate-900 flex items-center gap-1.5 flex-wrap">
+                          <span>{s.name.substring(0,1)}*{(s.name.length > 2) ? s.name.substring(2) : '원'} 학우</span>
+                          <span className="text-[10px] text-slate-400 font-semibold bg-slate-100 px-1.5 py-0.2 rounded-md">({s.major})</span>
+                        </h4>
+                        <p className="text-xs text-slate-500 font-bold">{s.university}</p>
+                      </div>
+
+                      {/* BIO snippet */}
+                      <p className="text-xs text-slate-600 mt-3 bg-slate-50 p-2.5 rounded-lg border border-slate-100 block max-h-24 overflow-y-auto leading-relaxed">
+                        {s.resume.bio || "미구현 이력 사항"}
+                      </p>
+
+                      {/* Verified Instructor review */}
+                      {verifiedReco ? (
+                        <div className="mt-4 border-l-2 border-indigo-600 pl-2 text-[11px] text-slate-500 space-y-0.5">
+                          <span className="font-extrabold text-slate-700 block">👨‍🏫 추천인 {verifiedReco.professorName} 소견:</span>
+                          <p className="italic leading-normal text-slate-600 font-serif">"{verifiedReco.content}"</p>
+                        </div>
+                      ) : (
+                        <div className="mt-4 text-[10.5px] text-slate-400/90 flex items-center gap-1 font-medium bg-amber-50/30 p-2 rounded-lg border border-amber-500/10">
+                          <span>⚠️ 학술 검증 진행 (스승의 추천 소견 서명 기립 대기 중)</span>
+                        </div>
+                      )}
+                    </div>
+
+                    <div>
+                      {/* Skill Badges */}
+                      <div className="flex flex-wrap gap-1 pt-3 border-t border-slate-100">
+                        {s.resume.skills.slice(0, 4).map((skill, i) => (
+                          <span key={i} className="text-[8.5px] font-extrabold bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded-md font-mono">
+                            {skill}
+                          </span>
+                        ))}
+                      </div>
+
+                      {/* Application trigger helper */}
+                      <div className="pt-3 flex justify-between items-center text-[10px] text-slate-400 font-medium pb-1">
+                        <span>등재일 {s.createdAt.substring(0, 10)}</span>
+                        {s.recommendationStatus === 'VERIFIED' ? (
+                          <span className="text-emerald-700 font-extrabold">인턴십 배치 대상 활성</span>
+                        ) : (
+                          <span className="text-amber-600 font-extrabold">검증 심사 중</span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* 5. SCENARIO GUIDE WALKTHROUGH */}
+        {currentTab === 'GUIDE' && (
+          <div className="max-w-4xl mx-auto space-y-6 text-left">
+            <div className="text-center space-y-1.5 py-4">
+              <h1 className="text-xl sm:text-2xl font-black text-slate-950 tracking-tight">💡 학술 검증 플랫폼 보안 메커니즘</h1>
+              <p className="text-xs text-slate-500">본 플랫폼이 대학 산하 학생의 성과 보증 장학 자격을 검증하는 핵심 5단 매칭 메커니즘을 상세히 소개합니다.</p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-stretch">
+              <div className="md:col-span-8 bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 space-y-6">
+                <h3 className="text-md font-extrabold text-slate-900 border-b pb-3 flex items-center gap-2">
+                  <ShieldCheck className="w-5 h-5 text-indigo-650" />
+                  플랫폼 검증 무결성 규칙 규범
+                </h3>
+
+                <div className="space-y-5 text-xs sm:text-sm">
+                  <div className="flex gap-4">
+                    <div className="bg-indigo-100 text-indigo-700 w-8 h-8 rounded-full flex items-center justify-center font-black shrink-0 text-xs">
+                      1
+                    </div>
+                    <div className="space-y-1">
+                      <h4 className="font-extrabold text-slate-900">익명성과 신뢰 보증의 공존</h4>
+                      <p className="text-xs text-slate-505 leading-relaxed">
+                        학생의 전체 이력사항과 전공 능력은 대중에게 암호화된 가명(Masked name) 처리로 노출됩니다. 오직 소속 지도교수가 학술적으로 '성과 검증 및 인품 강보증'을 발현해 추천서를 발행해야만 채용공고 지원이 물리적으로 작동합니다.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-4">
+                    <div className="bg-indigo-100 text-indigo-700 w-8 h-8 rounded-full flex items-center justify-center font-black shrink-0 text-xs">
+                      2
+                    </div>
+                    <div className="space-y-1">
+                      <h4 className="font-extrabold text-slate-900">교수 디지털 토큰 (김태진 교수, 박혜원 교수)</h4>
+                      <p className="text-xs text-slate-505 leading-relaxed">
+                        교수는 본인의 보안 계정에서 제자의 학술 역량을 인정하고 추천 자격을 '디지털 승인'할 수 있고, 만약 오프라인 승인의 경우 난수 코드로 암호화된 <strong>[PROF-KIM-7789] 형식의 일회성 서명 토큰</strong>을 발급해 학생 자격 이전을 인증받게 할 수 있습니다.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-4">
+                    <div className="bg-indigo-100 text-indigo-700 w-8 h-8 rounded-full flex items-center justify-center font-black shrink-0 text-xs">
+                      3
+                    </div>
+                    <div className="space-y-1">
+                      <h4 className="font-extrabold text-slate-900">기업 신원 자격 실증 및 국세청 조회</h4>
+                      <p className="text-xs text-slate-505 leading-relaxed">
+                        허위 유령 기업이 학생의 우수 기술 역량을 갈취하는 고질적 인턴 피해를 방지하기 위해 가입하려는 협력사는 국세청 사업자 번호를 입력하고 원본 자격 양식을 업로드해 플랫폼 총괄 관리자의 엄격한 전산상 수동 서류 심사를 완결 패스해야만 비로소 공고를 올릴 자격이 주어집니다.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="md:col-span-4 bg-gradient-to-br from-indigo-950 to-slate-950 text-white rounded-3xl p-6 flex flex-col justify-between border border-slate-800">
+                <div className="space-y-4">
+                  <h4 className="text-[10px] uppercase tracking-widest font-extrabold text-indigo-300">보안 통계 수치</h4>
+                  <div className="space-y-2">
+                    <span className="text-2xl sm:text-3xl font-black block">100%</span>
+                    <p className="text-[11.5px] text-slate-400 leading-relaxed">지도교수 학술 검증 날인이 결속된 명성 인재 매칭률. 단순 이력서 투입 대비 12배 이상의 전문 매칭 오퍼 계약 달성 중.</p>
+                  </div>
+                </div>
+                
+                <div className="pt-6 border-t border-white/10 text-[11px] text-slate-400 font-medium">
+                  본 체계는 2026-06-13 기준 대한민국 주요 연구 중심 대학과 연동 시뮬레이션 중입니다.
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* 6. LOGGED-IN DYNAMIC ROLE-BASED DASHBOARDS */}
+        {currentTab === 'DASHBOARD' && isLoggedIn && (
+          <div className="space-y-6 animate-fade-in" id="dashboard-routed-view">
+            
+            {/* Context Session Header details block */}
+            <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-2xs flex flex-col md:flex-row justify-between items-start md:items-center gap-4 text-left">
               <div className="flex items-center gap-3">
                 <div className="p-2.5 rounded-xl bg-indigo-50 border text-indigo-600 font-bold select-none text-md">
                   {currentRole === 'STUDENT' && '🎓'}
@@ -693,25 +1070,25 @@ export default function App() {
                   {currentRole === 'ADMIN' && '💻'}
                 </div>
                 <div>
-                  <span className="text-[10px] text-slate-400 uppercase tracking-widest font-bold">현재 임대 세션 브릿지</span>
+                  <span className="text-[10px] text-slate-400 uppercase tracking-widest font-black block">현재 가용 보안 인증 채널</span>
                   <h2 className="text-md font-bold text-slate-800 flex items-center gap-1.5">
-                    {currentRole === 'STUDENT' && `학생: ${activeStudent?.name || '로딩 중...'} (소속: ${activeStudent?.university})`}
-                    {currentRole === 'PROFESSOR' && `교수진: ${activeProfessor?.name || '로딩 중...'} (${activeProfessor?.department})`}
-                    {currentRole === 'COMPANY' && `파트너 기업: ${activeCompany?.name || '로딩 중...'} [업종: ${activeCompany?.industry}]`}
-                    {currentRole === 'ADMIN' && '플랫폼 총괄 관리 보안 아카이브 (SYSADMIN)'}
+                    {currentRole === 'STUDENT' && `학생 마이페이지: ${activeStudent?.name || '로딩 중...'} [소속: ${activeStudent?.university}]`}
+                    {currentRole === 'PROFESSOR' && `교수 업무실: ${activeProfessor?.name || '로딩 중...'} [학과: ${activeProfessor?.department}]`}
+                    {currentRole === 'COMPANY' && `협력사 전용 페이지: ${activeCompany?.name || '로딩 중...'} [업종: ${activeCompany?.industry}]`}
+                    {currentRole === 'ADMIN' && '아카이브 총괄 행정 관리소 (sysadmin)'}
                   </h2>
                 </div>
               </div>
               
               <div className="flex items-center gap-2">
-                <span className="text-xs text-slate-400 font-medium">데모 DB 정합성 상태 : </span>
-                <span className="inline-flex items-center text-[10.5px] text-emerald-800 font-semibold bg-emerald-50 border border-emerald-100 px-3/5 py-1 rounded-full gap-1">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 block"></span> 로컬 연동 가열화 가동 중
+                <span className="text-xs text-slate-400 font-medium">실시간 전산 상태 : </span>
+                <span className="inline-flex items-center text-[10px] sm:text-[11px] text-emerald-800 font-semibold bg-emerald-50 border border-emerald-100 px-3 py-1 rounded-full gap-1">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 block animate-ping"></span> 세션 유지 중
                 </span>
               </div>
             </div>
 
-            {/* Dynamic Screen router core */}
+            {/* Core views switcher */}
             <div className="min-h-[50vh]">
               {currentRole === 'STUDENT' && activeStudent && (
                 <StudentDashboard
@@ -765,6 +1142,7 @@ export default function App() {
             </div>
           </div>
         )}
+
       </main>
 
       {/* SignUp Wizard dialog overlay */}
@@ -777,6 +1155,50 @@ export default function App() {
           professors={professors}
         />
       )}
+
+      {/* 🔓 COLLAPSIBLE DEVELOPER QUICK-SWITCH PANEL (Located beautifully at the bottom, perfectly accessible) */}
+      <div className="fixed bottom-4 right-4 z-40" id="dev-swapper-drawer">
+        {isDevSwapperOpen ? (
+          <div className="bg-slate-900 text-slate-100 p-4 rounded-2xl shadow-xl border border-slate-700 w-[320px] sm:w-[480px] max-w-[calc(100vw-32px)] space-y-3 animate-fade-in relative text-left">
+            <button 
+              onClick={() => setIsDevSwapperOpen(false)}
+              className="absolute top-3 right-3 text-slate-400 hover:text-white font-extrabold text-xs cursor-pointer"
+            >
+              닫기 ✕
+            </button>
+            
+            <div className="space-y-1">
+              <span className="text-[9px] uppercase tracking-wider font-extrabold text-indigo-400 font-mono">체계 모의 주입기</span>
+              <h4 className="text-xs font-bold text-slate-200">개발자 실시간 모의 등급 스위치</h4>
+              <p className="text-[10px] text-slate-400 leading-normal font-sans">로그인 양식을 거치지 않고 완결 흐름(추천 서명 &rarr; 선발 승인 &rarr; 결제 원장 확인)을 빠른 속도로 검증하기 위해 세션을 강제 할당합니다.</p>
+            </div>
+
+            <div className="pt-2 border-t border-slate-800">
+              <RoleSwitcher
+                currentRole={currentRole}
+                currentActorId={currentActorId}
+                students={students}
+                professors={professors}
+                companies={companies}
+                onActorChange={handleActorChange}
+                onResetData={resetToDefaults}
+                onOpenSignUpTrigger={() => { setShowSignUpDialog(true); setIsDevSwapperOpen(false); }}
+              />
+            </div>
+          </div>
+        ) : (
+          <button
+            onClick={() => setIsDevSwapperOpen(true)}
+            className="bg-indigo-650 hover:bg-indigo-600 font-extrabold text-white text-xs px-4 py-2.5 rounded-full shadow-lg flex items-center gap-1.5 select-none transition-all cursor-pointer hover:scale-105 border border-indigo-500/20"
+          >
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+            </span>
+            <span>🔑 모의 스위칭 바</span>
+          </button>
+        )}
+      </div>
 
       {/* Footer credit section conforming to humble literals */}
       <footer className="bg-white border-t border-slate-200 py-6 text-center text-xs text-slate-400 mt-20">
