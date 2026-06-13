@@ -32,6 +32,7 @@ import AdminDashboard from './components/AdminDashboard';
 import SignUpSimulator from './components/SignUpSimulator';
 import AcademicHome from './components/AcademicHome';
 import AuthenticationPage from './components/AuthenticationPage';
+import GuidePage from './components/GuidePage';
 import { 
   Sparkles, 
   HelpCircle, 
@@ -730,53 +731,6 @@ export default function App() {
       {/* Main Content Stage container */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-8 space-y-6">
         
-        {/* Helper interactive instructions widget card */}
-        {showDemoTips && (
-          <div className="bg-gradient-to-r from-slate-900 to-indigo-950 text-slate-100 rounded-2xl p-6 shadow-md border border-slate-800 relative">
-            <button 
-              onClick={() => setShowDemoTips(false)}
-              className="absolute top-4 right-4 text-slate-400 hover:text-white text-xs cursor-pointer font-bold"
-            >
-              숨기기
-            </button>
-            
-            <div className="flex items-start gap-3">
-              <BookOpen className="w-6 h-6 text-indigo-400 mt-0.5 shrink-0" />
-              <div className="space-y-3">
-                <div className="space-y-1 text-left">
-                  <h4 className="text-sm font-bold text-slate-200">💡 학술 인턴십 매칭 플랫폼 데모 시나리오 안내 가이드</h4>
-                  <p className="text-[11px] text-slate-400 leading-normal">
-                    본 서비스는 무분별한 단순 입사 지원을 통제하기 위해 <strong>'교수진의 학술 추천 소견서'</strong> 제출과 <strong>'정부 인증된 공공/민간 기업 신원'</strong>이 가공 대조되어야만 가입과 구인이 원천 작동하게 빌드되었습니다. 아래 제안 흐름을 직접 수행하며 무결성 구조를 검토해 볼 수 있습니다.
-                  </p>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-5 gap-3 text-[10.5px] leading-relaxed text-slate-300 text-left">
-                  <div className="bg-slate-950/40 p-3 rounded-xl border border-slate-850">
-                    <span className="font-bold text-indigo-400 block mb-1">1단계: 학생 가입제한</span>
-                    기본 선택된 <strong>한지원 학생(대기)</strong>은 추천서가 부재해 공고 접근이 원천 차단됩니다.
-                  </div>
-                  <div className="bg-slate-950/40 p-3 rounded-xl border border-slate-850">
-                    <span className="font-bold text-indigo-400 block mb-1">2단계: 스승 추천 서명</span>
-                    하단 레이아웃 우측의 <strong>"모의 스위칭 바"</strong>를 열고 <strong>"김태진 교수"</strong>를 선택해 대기 제자란의 <strong>한지원 님</strong>을 수락 서명해 발송해 주십시오.
-                  </div>
-                  <div className="bg-slate-950/40 p-3 rounded-xl border border-slate-850">
-                    <span className="font-bold text-indigo-400 block mb-1">3단계: 인턴 투입 지원</span>
-                    다시 <strong>한지원 학생</strong>으로 스위치하면 차단 해제를 경험할 수 있습니다. <strong>(주)네오소프트</strong>에 이력서 지원을 투고하십시오!
-                  </div>
-                  <div className="bg-slate-950/40 p-3 rounded-xl border border-slate-850">
-                    <span className="font-bold text-indigo-400 block mb-1">4단계: 기업 합격 인허</span>
-                    <strong>"네오소프트 인사팀"</strong>으로 변경하신 뒤, 지원자 전형 탭에서 서류 검토 후 <strong>최종 선발 승인</strong>을 결정해 주십시오.
-                  </div>
-                  <div className="bg-slate-950/40 p-3 rounded-xl border border-slate-850">
-                    <span className="font-bold text-indigo-400 block mb-1">5단계: 심사 대장 확인</span>
-                    <strong>"총괄 관리자(Admin)"</strong> 대장을 열면 완결 매칭 서명 대장의 고결 서류 보존 내역이 세목 기록 완료되어 있습니다.
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
         {/* -------------------- ROUTED PAGES CORE -------------------- */}
 
         {/* 1. INITIAL / LANDING PAGE */}
@@ -987,73 +941,7 @@ export default function App() {
 
         {/* 5. SCENARIO GUIDE WALKTHROUGH */}
         {currentTab === 'GUIDE' && (
-          <div className="max-w-4xl mx-auto space-y-6 text-left">
-            <div className="text-center space-y-1.5 py-4">
-              <h1 className="text-xl sm:text-2xl font-black text-slate-950 tracking-tight">💡 학술 검증 플랫폼 보안 메커니즘</h1>
-              <p className="text-xs text-slate-500">본 플랫폼이 대학 산하 학생의 성과 보증 장학 자격을 검증하는 핵심 5단 매칭 메커니즘을 상세히 소개합니다.</p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-stretch">
-              <div className="md:col-span-8 bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 space-y-6">
-                <h3 className="text-md font-extrabold text-slate-900 border-b pb-3 flex items-center gap-2">
-                  <ShieldCheck className="w-5 h-5 text-indigo-650" />
-                  플랫폼 검증 무결성 규칙 규범
-                </h3>
-
-                <div className="space-y-5 text-xs sm:text-sm">
-                  <div className="flex gap-4">
-                    <div className="bg-indigo-100 text-indigo-700 w-8 h-8 rounded-full flex items-center justify-center font-black shrink-0 text-xs">
-                      1
-                    </div>
-                    <div className="space-y-1">
-                      <h4 className="font-extrabold text-slate-900">익명성과 신뢰 보증의 공존</h4>
-                      <p className="text-xs text-slate-505 leading-relaxed">
-                        학생의 전체 이력사항과 전공 능력은 대중에게 암호화된 가명(Masked name) 처리로 노출됩니다. 오직 소속 지도교수가 학술적으로 '성과 검증 및 인품 강보증'을 발현해 추천서를 발행해야만 채용공고 지원이 물리적으로 작동합니다.
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex gap-4">
-                    <div className="bg-indigo-100 text-indigo-700 w-8 h-8 rounded-full flex items-center justify-center font-black shrink-0 text-xs">
-                      2
-                    </div>
-                    <div className="space-y-1">
-                      <h4 className="font-extrabold text-slate-900">교수 디지털 토큰 (김태진 교수, 박혜원 교수)</h4>
-                      <p className="text-xs text-slate-505 leading-relaxed">
-                        교수는 본인의 보안 계정에서 제자의 학술 역량을 인정하고 추천 자격을 '디지털 승인'할 수 있고, 만약 오프라인 승인의 경우 난수 코드로 암호화된 <strong>[PROF-KIM-7789] 형식의 일회성 서명 토큰</strong>을 발급해 학생 자격 이전을 인증받게 할 수 있습니다.
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex gap-4">
-                    <div className="bg-indigo-100 text-indigo-700 w-8 h-8 rounded-full flex items-center justify-center font-black shrink-0 text-xs">
-                      3
-                    </div>
-                    <div className="space-y-1">
-                      <h4 className="font-extrabold text-slate-900">기업 신원 자격 실증 및 국세청 조회</h4>
-                      <p className="text-xs text-slate-505 leading-relaxed">
-                        허위 유령 기업이 학생의 우수 기술 역량을 갈취하는 고질적 인턴 피해를 방지하기 위해 가입하려는 협력사는 국세청 사업자 번호를 입력하고 원본 자격 양식을 업로드해 플랫폼 총괄 관리자의 엄격한 전산상 수동 서류 심사를 완결 패스해야만 비로소 공고를 올릴 자격이 주어집니다.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="md:col-span-4 bg-gradient-to-br from-indigo-950 to-slate-950 text-white rounded-3xl p-6 flex flex-col justify-between border border-slate-800">
-                <div className="space-y-4">
-                  <h4 className="text-[10px] uppercase tracking-widest font-extrabold text-indigo-300">보안 통계 수치</h4>
-                  <div className="space-y-2">
-                    <span className="text-2xl sm:text-3xl font-black block">100%</span>
-                    <p className="text-[11.5px] text-slate-400 leading-relaxed">지도교수 학술 검증 날인이 결속된 명성 인재 매칭률. 단순 이력서 투입 대비 12배 이상의 전문 매칭 오퍼 계약 달성 중.</p>
-                  </div>
-                </div>
-                
-                <div className="pt-6 border-t border-white/10 text-[11px] text-slate-400 font-medium">
-                  본 체계는 2026-06-13 기준 대한민국 주요 연구 중심 대학과 연동 시뮬레이션 중입니다.
-                </div>
-              </div>
-            </div>
-          </div>
+          <GuidePage />
         )}
 
         {/* 6. LOGGED-IN DYNAMIC ROLE-BASED DASHBOARDS */}

@@ -4,16 +4,16 @@ export const INITIAL_PROFESSORS: Professor[] = [
   {
     id: 'prof-kim',
     name: '김태진 교수',
-    email: 'tjkim@university.edu',
-    university: '한국대학교',
+    email: 'tjkim@sejong.ac.kr',
+    university: '세종대학교',
     department: '컴퓨터공학과',
     createdAt: '2026-03-10T10:00:00Z'
   },
   {
     id: 'prof-park',
     name: '박서현 교수',
-    email: 'shpark@university.edu',
-    university: '글로벌대학교',
+    email: 'shpark@sejong.ac.kr',
+    university: '세종대학교',
     department: '인공지능학과',
     createdAt: '2026-04-15T14:30:00Z'
   }
@@ -55,12 +55,12 @@ export const INITIAL_STUDENTS: Student[] = [
     id: 'stud-minsoo',
     name: '강민수',
     email: 'minsoo@gmail.com',
-    university: '한국대학교',
+    university: '세종대학교',
     major: '컴퓨터공학과',
     resume: {
       bio: '풀스택 웹 프레임워크와 클라우드 서비스에 지대한 관심이 있으며, 프론트엔드 성능 최적화를 깊고 치열하게 고민하는 3학년 재학생 강민수입니다.',
       skills: ['React', 'TypeScript', 'Tailwind CSS', 'Node.js', 'Express', 'Git'],
-      education: '한국대학교 컴퓨터공학과 3학년 (학점 4.1 / 4.5)',
+      education: '세종대학교 컴퓨터공학과 3학년 (학점 4.1 / 4.5)',
       experience: '교내 웹 개발 동아리 회장 (2025.03 ~ 현재)\n학부 멘토링 프로그램 웹 프론트엔드 멘토 수행',
       projects: '1. 교내 수강신청 가이드 웹앱 프로젝트 - React 기반 수강 정원 시각화\n2. AI 요약 뉴스레터 플랫폼 - 개인 관심사 맞춤형 AI 크롤러 플랫폼',
       fileName: '강민수_이력서_풀스택.pdf',
@@ -75,17 +75,17 @@ export const INITIAL_STUDENTS: Student[] = [
     id: 'stud-jiwon',
     name: '한지원',
     email: 'jiwon@gmail.com',
-    university: '한국대학교',
+    university: '세종대학교',
     major: '컴퓨터공학과',
     resume: {
       bio: '데이터 분산 처리 인프라와 머신러닝 데이터 파이프라인에 깊고 넓은 매력을 느끼는 예비 개발자입니다.',
       skills: ['Python', 'SQL', 'PyTorch', 'Data Analysis'],
-      education: '한국대학교 컴퓨터공학과 4학년 (학점 3.9 / 4.5)',
+      education: '세종대학교 컴퓨터공학과 4학년 (학점 3.9 / 4.5)',
       experience: '교내 알고리즘 소모임 정회원 (2025 ~ 현재)'
     },
     recommendationStatus: 'PENDING', // 가입 중 추천 대기 상태
     requestedProfessorName: '김태진 교수',
-    requestedProfessorEmail: 'tjkim@university.edu',
+    requestedProfessorEmail: 'tjkim@sejong.ac.kr',
     createdAt: '2026-06-12T14:10:00Z'
   }
 ];
@@ -98,7 +98,7 @@ export const INITIAL_RECOMMENDATIONS: Recommendation[] = [
     studentName: '강민수',
     professorId: 'prof-kim',
     professorName: '김태진 교수',
-    professorEmail: 'tjkim@university.edu',
+    professorEmail: 'tjkim@sejong.ac.kr',
     relationship: '지도교수',
     content: '강민수 학생은 학과 전공 성적이 우수할 뿐 아니라, 학업 외적인 웹 알고리즘 프로젝트 설계 능력이 탁월한 인재입니다. 교내 학술대회에서 데이터 처리 동시성 제어 프로젝트로 입상한 경험이 있으며, 주도적이고 협동 정신이 뛰어납니다. 적극 추천합니다.',
     tags: ['성실성 우수', '코딩 역량 탁월', '문제 해결 주도성', '협업 인성 우수'],
@@ -112,7 +112,7 @@ export const INITIAL_RECOMMENDATION_CODES: RecommendationCode[] = [
     code: 'PROF-KIM-7789',
     professorId: 'prof-kim',
     professorName: '김태진 교수',
-    professorEmail: 'tjkim@university.edu',
+    professorEmail: 'tjkim@sejong.ac.kr',
     issuedForEmail: 'jiwon@gmail.com',
     createdAt: '2026-06-11T16:00:00Z',
     isUsed: false,
@@ -122,7 +122,7 @@ export const INITIAL_RECOMMENDATION_CODES: RecommendationCode[] = [
     code: 'PROF-PARK-0012',
     professorId: 'prof-park',
     professorName: '박서현 교수',
-    professorEmail: 'shpark@university.edu',
+    professorEmail: 'shpark@sejong.ac.kr',
     createdAt: '2026-06-12T10:00:00Z',
     isUsed: false,
     relationship: '교과목 수업 교수'
@@ -188,11 +188,11 @@ export const INITIAL_APPLICATIONS: JobApplication[] = [
     studentName: '강민수',
     studentEmail: 'minsoo@gmail.com',
     studentMajor: '컴퓨터공학과',
-    studentUniversity: '한국대학교',
+    studentUniversity: '세종대학교',
     resume: {
       bio: '풀스택 웹 프레임워크와 클라우드 서비스에 지대한 관심이 있으며, 프론트엔드 성능 최적화를 깊고 치열하게 고민하는 3학년 재학생 강민수입니다.',
       skills: ['React', 'TypeScript', 'Tailwind CSS', 'Node.js', 'Express', 'Git'],
-      education: '한국대학교 컴퓨터공학과 3학년 (학점 4.1 / 4.5)',
+      education: '세종대학교 컴퓨터공학과 3학년 (학점 4.1 / 4.5)',
       experience: '교내 웹 개발 동아리 회장 (2025.03 ~ 현재)\n학부 멘토링 프로그램 웹 프론트엔드 멘토 수행',
       projects: '1. 교내 수강신청 가이드 웹앱 프로젝트 - React 기반 수강 정원 시각화\n2. AI 요약 뉴스레터 플랫폼 - 개인 관심사 맞춤형 AI 크롤러 플랫폼',
       fileName: '강민수_이력서_풀스택.pdf',

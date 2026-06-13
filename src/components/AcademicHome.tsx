@@ -455,10 +455,10 @@ export default function AcademicHome({
 
         <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-4 text-center items-center pt-2">
           <div className="p-3 bg-slate-50 border border-slate-100/90 rounded-xl font-bold text-xs text-slate-500 hover:text-slate-700 transition">
-            🏫 한국대학교
+            🏫 세종대학교
           </div>
           <div className="p-3 bg-slate-50 border border-slate-100/90 rounded-xl font-bold text-xs text-slate-500 hover:text-slate-700 transition">
-            🏫 글로벌대학교
+            🏫 세종대 인공지능원
           </div>
           <div className="p-3 bg-slate-50 border border-slate-100/90 rounded-xl font-bold text-xs text-slate-500 hover:text-slate-700 transition">
             🏢 (주)네오소프트

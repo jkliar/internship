@@ -41,16 +41,16 @@ export default function SignUpSimulator({
   // Student Form states
   const [studName, setStudName] = useState('');
   const [studEmail, setStudEmail] = useState('');
-  const [studUni, setStudUni] = useState('한국대학교');
+  const [studUni, setStudUni] = useState('세종대학교');
   const [studMajor, setStudMajor] = useState('컴퓨터공학과');
   const [studBio, setStudBio] = useState('');
   const [studSkills, setStudSkills] = useState('');
-  const [targetProfEmail, setTargetProfEmail] = useState(professors[0]?.email || 'tjkim@university.edu');
+  const [targetProfEmail, setTargetProfEmail] = useState(professors[0]?.email || 'tjkim@sejong.ac.kr');
 
   // Professor Form states
   const [profName, setProfName] = useState('');
   const [profEmail, setProfEmail] = useState('');
-  const [profUni, setProfUni] = useState('한국대학교');
+  const [profUni, setProfUni] = useState('세종대학교');
   const [profDept, setProfDept] = useState('컴퓨터공학과');
 
   // Company Form states
