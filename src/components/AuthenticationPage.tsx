@@ -13,6 +13,7 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { UserRole, Student, Professor, Company } from '../types';
+import { getSupabase, isSupabaseConfigured } from '../lib/supabase';
 
 interface AuthenticationPageProps {
   students: Student[];
@@ -48,7 +49,7 @@ export default function AuthenticationPage({
     }, 700);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
@@ -63,7 +64,50 @@ export default function AuthenticationPage({
 
     setLoading(true);
 
-    // Simulate real database checks
+    // If Supabase is configured, use actual Supabase auth
+    const supabase = getSupabase();
+    if (supabase) {
+      try {
+        const { data, error: sbError } = await supabase.auth.signInWithPassword({
+          email: email.toLowerCase().trim(),
+          password: password,
+        });
+
+        if (sbError) {
+          setLoading(false);
+          setError(`Supabase 실시간 인증 실패: ${sbError.message}`);
+          return;
+        }
+
+        // Successfully logged in via Supabase! Let's match the user context.
+        const userMetadata = data.user?.user_metadata || {};
+        const metaRole = (userMetadata.role || activeTab) as UserRole;
+
+        let foundId = '';
+        if (metaRole === 'STUDENT') {
+          const found = students.find(s => s.email.toLowerCase() === email.toLowerCase().trim());
+          foundId = found ? found.id : `stud-sb-${data.user?.id}`;
+        } else if (metaRole === 'PROFESSOR') {
+          const found = professors.find(p => p.email.toLowerCase() === email.toLowerCase().trim());
+          foundId = found ? found.id : `prof-sb-${data.user?.id}`;
+        } else if (metaRole === 'COMPANY') {
+          const found = companies.find(c => c.email.toLowerCase() === email.toLowerCase().trim());
+          foundId = found ? found.id : `comp-sb-${data.user?.id}`;
+        } else {
+          foundId = 'admin';
+        }
+
+        setLoading(false);
+        onLoginSuccess(metaRole, foundId);
+        return;
+      } catch (err: any) {
+        setLoading(false);
+        setError(`Supabase 통신 오류 및 로그인 장애: ${err.message || err}`);
+        return;
+      }
+    }
+
+    // Simulate real database checks (Simulation mode)
     setTimeout(() => {
       setLoading(false);
       
@@ -134,7 +178,7 @@ export default function AuthenticationPage({
             <span>국세청 사업자 번호 연동 기업 신원 보증</span>
           </div>
           <div className="mt-4 pt-2 text-[10.5px] text-slate-500">
-            © 2026 Hibrain Matcher Hub. All security credentials active.
+            © 2026 TEEDLAB Matcher Hub. All security credentials active.
           </div>
         </div>
       </div>
@@ -143,10 +187,23 @@ export default function AuthenticationPage({
       <div className="lg:col-span-7 space-y-6 flex flex-col justify-center">
         
         <div className="bg-white rounded-3xl border border-slate-200 p-6 sm:p-10 shadow-3xs space-y-6">
-          <div className="space-y-2">
-            <h2 className="text-xl font-extrabold text-slate-900 tracking-tight">통합 사용자 로그인</h2>
-            <p className="text-xs text-slate-500">지정된 플랫폼 사용 등급에 맞추어 계정 자격을 검증합니다.</p>
+          
+          {/* Connection Status Flag */}
+          <div className="flex items-center justify-between border-b pb-3 border-slate-100 text-xs">
+            <h2 className="text-xl font-extrabold text-slate-900 tracking-tight text-left">통합 사용자 로그인</h2>
+            {isSupabaseConfigured() ? (
+              <span className="bg-emerald-50 text-emerald-700 font-bold px-2 py-1 rounded-md flex items-center gap-1 leading-none shrink-0">
+                <span className="w-1.5 h-1.5 bg-emerald-600 rounded-full animate-ping"></span>
+                실시간 연동 중
+              </span>
+            ) : (
+              <span className="bg-slate-50 text-slate-550 font-bold px-2 py-1 rounded-md flex items-center gap-1 leading-none shrink-0">
+                <span className="w-1.5 h-1.5 bg-slate-400 rounded-full"></span>
+                체험용 시뮬레이션
+              </span>
+            )}
           </div>
+          <p className="text-xs text-slate-500 -mt-3 text-left">지정된 플랫폼 사용 등급에 맞추어 계정 자격을 검증합니다.</p>
 
           {/* Role Choice Tabs */}
           <div className="grid grid-cols-4 gap-1.5 p-1 bg-slate-100 rounded-xl">

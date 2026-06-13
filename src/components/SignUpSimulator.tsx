@@ -20,6 +20,7 @@ import {
   FileBadge
 } from 'lucide-react';
 import { Student, Professor, Company, Resume } from '../types';
+import { getSupabase, isSupabaseConfigured, SUPABASE_CONFIG_INFO } from '../lib/supabase';
 
 interface SignUpSimulatorProps {
   onClose: () => void;
@@ -63,12 +64,54 @@ export default function SignUpSimulator({
   const [compAddress, setCompAddress] = useState('');
   const [compFileName, setCompFileName] = useState('사업자등록증_사본_제출본.pdf');
 
+  // Supabase Real Authentication fields
+  const [studPassword, setStudPassword] = useState('');
+  const [profPassword, setProfPassword] = useState('');
+  const [compPassword, setCompPassword] = useState('');
+  const [sbError, setSbError] = useState('');
+  const [sbLoading, setSbLoading] = useState(false);
+
   // Common notification
   const [showSuccessMsg, setShowSuccessMsg] = useState(false);
 
-  const handleStudentSubmit = (e: React.FormEvent) => {
+  const handleStudentSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!studName || !studEmail || !studBio) return;
+    
+    const isSBCorrect = isSupabaseConfigured();
+    if (isSBCorrect && !studPassword) {
+      setSbError('Supabase 연동상태입니다. 가입 비밀번호를 입력해주십시오.');
+      return;
+    }
+
+    const supabase = getSupabase();
+    if (supabase) {
+      setSbLoading(true);
+      setSbError('');
+      try {
+        const { error } = await supabase.auth.signUp({
+          email: studEmail.trim(),
+          password: studPassword,
+          options: {
+            data: {
+              role: 'STUDENT',
+              name: studName,
+              university: studUni,
+              major: studMajor
+            }
+          }
+        });
+        setSbLoading(false);
+        if (error) {
+          setSbError(`Supabase 신규 가입 에러: ${error.message} (비밀번호 최소 6자 이상 필요)`);
+          return;
+        }
+      } catch (err: any) {
+        setSbLoading(false);
+        setSbError(`Supabase 통신 장애: ${err.message || err}`);
+        return;
+      }
+    }
     
     onRegisterStudent(
       studName,
@@ -84,17 +127,87 @@ export default function SignUpSimulator({
     triggerSuccessAndClose();
   };
 
-  const handleProfessorSubmit = (e: React.FormEvent) => {
+  const handleProfessorSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!profName || !profEmail) return;
+
+    const isSBCorrect = isSupabaseConfigured();
+    if (isSBCorrect && !profPassword) {
+      setSbError('Supabase 연동상태입니다. 가입 비밀번호를 입력해주십시오.');
+      return;
+    }
+
+    const supabase = getSupabase();
+    if (supabase) {
+      setSbLoading(true);
+      setSbError('');
+      try {
+        const { error } = await supabase.auth.signUp({
+          email: profEmail.trim(),
+          password: profPassword,
+          options: {
+            data: {
+              role: 'PROFESSOR',
+              name: profName,
+              university: profUni,
+              department: profDept
+            }
+          }
+        });
+        setSbLoading(false);
+        if (error) {
+          setSbError(`Supabase 신규 가입 에러: ${error.message} (비밀번호 최소 6자 이상 필요)`);
+          return;
+        }
+      } catch (err: any) {
+        setSbLoading(false);
+        setSbError(`Supabase 통신 장애: ${err.message || err}`);
+        return;
+      }
+    }
 
     onRegisterProfessor(profName, profEmail, profUni, profDept);
     triggerSuccessAndClose();
   };
 
-  const handleCompanySubmit = (e: React.FormEvent) => {
+  const handleCompanySubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!compName || !compEmail || !compBusinessId || !compAddress) return;
+
+    const isSBCorrect = isSupabaseConfigured();
+    if (isSBCorrect && !compPassword) {
+      setSbError('Supabase 연동상태입니다. 가입 비밀번호를 입력해주십시오.');
+      return;
+    }
+
+    const supabase = getSupabase();
+    if (supabase) {
+      setSbLoading(true);
+      setSbError('');
+      try {
+        const { error } = await supabase.auth.signUp({
+          email: compEmail.trim(),
+          password: compPassword,
+          options: {
+            data: {
+              role: 'COMPANY',
+              name: compName,
+              companyName: compName,
+              businessId: compBusinessId
+            }
+          }
+        });
+        setSbLoading(false);
+        if (error) {
+          setSbError(`Supabase 신규 가입 에러: ${error.message} (비밀번호 최소 6자 이상 필요)`);
+          return;
+        }
+      } catch (err: any) {
+        setSbLoading(false);
+        setSbError(`Supabase 통신 장애: ${err.message || err}`);
+        return;
+      }
+    }
 
     onRegisterCompany(
       compName,
@@ -191,7 +304,31 @@ export default function SignUpSimulator({
             </div>
 
             {/* Scrollable form view content */}
-            <div className="p-6 max-h-[70vh] overflow-y-auto">
+            <div className="p-6 max-h-[70vh] overflow-y-auto space-y-4">
+              
+              {/* Connection Status Flag */}
+              <div className="flex items-center justify-between bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs leading-none">
+                <span className="text-slate-500 font-semibold">서버 연동 검증:</span>
+                {isSupabaseConfigured() ? (
+                  <span className="bg-emerald-50 text-emerald-700 font-bold px-2 py-1 rounded flex items-center gap-1.5 animation-pulse">
+                    <span className="w-1.5 h-1.5 bg-emerald-650 rounded-full"></span>
+                    Supabase Live 실시간 보안 클라이언트 활성화
+                  </span>
+                ) : (
+                  <span className="bg-amber-50 text-amber-705 font-bold px-2 py-1 rounded flex items-center gap-1.5 ">
+                    <span className="w-1.5 h-1.5 bg-amber-500 rounded-full"></span>
+                    로컬 샌드박스 오프라인 시뮬레이션
+                  </span>
+                )}
+              </div>
+
+              {sbError && (
+                <div className="bg-rose-50 border border-rose-100/90 text-rose-850 p-3.5 rounded-xl text-xs flex items-center gap-2 font-semibold">
+                  <AlertCircle className="w-4 h-4 text-rose-500 shrink-0" />
+                  <span>{sbError}</span>
+                </div>
+              )}
+
               {/* STUDENT SIGNUP FORM */}
               {activeForm === 'student' && (
                 <form onSubmit={handleStudentSubmit} className="space-y-4">
@@ -203,7 +340,7 @@ export default function SignUpSimulator({
                     </p>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-3 gap-3">
                     <div>
                       <label className="block text-[11px] font-semibold text-slate-500 mb-1">성명</label>
                       <input
@@ -224,6 +361,19 @@ export default function SignUpSimulator({
                         value={studEmail}
                         onChange={(e) => setStudEmail(e.target.value)}
                         className="w-full border rounded-xl px-3 py-2 text-xs font-mono"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[11px] font-semibold text-slate-500 mb-1">
+                        비밀번호 {isSupabaseConfigured() && <span className="text-emerald-600 font-extrabold">*</span>}
+                      </label>
+                      <input
+                        type="password"
+                        required={isSupabaseConfigured()}
+                        placeholder={isSupabaseConfigured() ? "최소 6자" : "자유 (선택)"}
+                        value={studPassword}
+                        onChange={(e) => setStudPassword(e.target.value)}
+                        className="w-full border rounded-xl px-3 py-2 text-xs"
                       />
                     </div>
                   </div>
@@ -292,9 +442,11 @@ export default function SignUpSimulator({
 
                   <button
                     type="submit"
-                    className="w-full bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold py-3 rounded-xl transition-colors mt-6 shadow-2xs"
+                    disabled={sbLoading}
+                    className="w-full bg-slate-900 hover:bg-slate-800 disabled:bg-slate-300 text-white text-xs font-bold py-3 rounded-xl transition-colors mt-6 shadow-2xs flex items-center justify-center gap-2 cursor-pointer"
                   >
-                    제자 인턴후보 가입하기 (추천 대기)
+                    {sbLoading && <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>}
+                    <span>제자 인턴후보 가입하기 (추천 대기)</span>
                   </button>
                 </form>
               )}
@@ -314,16 +466,31 @@ export default function SignUpSimulator({
                     />
                   </div>
 
-                  <div>
-                    <label className="block text-[11px] font-semibold text-slate-500 mb-1">대학 소속 이메일</label>
-                    <input
-                      type="email"
-                      required
-                      placeholder="username@university.edu"
-                      value={profEmail}
-                      onChange={(e) => setProfEmail(e.target.value)}
-                      className="w-full border rounded-xl px-3 py-2.5 text-xs font-mono"
-                    />
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-[11px] font-semibold text-slate-500 mb-1">대학 소속 이메일</label>
+                      <input
+                        type="email"
+                        required
+                        placeholder="username@sejong.ac.kr"
+                        value={profEmail}
+                        onChange={(e) => setProfEmail(e.target.value)}
+                        className="w-full border rounded-xl px-3 py-2.5 text-xs font-mono"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[11px] font-semibold text-slate-500 mb-1">
+                        비밀번호 {isSupabaseConfigured() && <span className="text-emerald-600 font-extrabold">*</span>}
+                      </label>
+                      <input
+                        type="password"
+                        required={isSupabaseConfigured()}
+                        placeholder={isSupabaseConfigured() ? "최소 6자" : "자유 (선택)"}
+                        value={profPassword}
+                        onChange={(e) => setProfPassword(e.target.value)}
+                        className="w-full border rounded-xl px-3 py-2.5 text-xs font-mono"
+                      />
+                    </div>
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
@@ -351,9 +518,11 @@ export default function SignUpSimulator({
 
                   <button
                     type="submit"
-                    className="w-full bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold py-3 rounded-xl transition-colors mt-6 shadow-2xs"
+                    disabled={sbLoading}
+                    className="w-full bg-slate-900 hover:bg-slate-800 disabled:bg-slate-300 text-white text-xs font-bold py-3 rounded-xl transition-colors mt-6 shadow-2xs flex items-center justify-center gap-2 cursor-pointer"
                   >
-                    학부 매칭 위원 교수 상시 등록
+                    {sbLoading && <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>}
+                    <span>학부 매칭 위원 교수 상시 등록</span>
                   </button>
                 </form>
               )}
@@ -369,7 +538,7 @@ export default function SignUpSimulator({
                     </p>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-3 gap-3">
                     <div>
                       <label className="block text-[11px] font-semibold text-slate-500 mb-1">법인/기관 정식 명칭</label>
                       <input
@@ -390,6 +559,19 @@ export default function SignUpSimulator({
                         value={compEmail}
                         onChange={(e) => setCompEmail(e.target.value)}
                         className="w-full border rounded-xl px-3 py-2 text-xs font-mono"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[11px] font-semibold text-slate-500 mb-1">
+                        비밀번호 {isSupabaseConfigured() && <span className="text-emerald-600 font-extrabold">*</span>}
+                      </label>
+                      <input
+                        type="password"
+                        required={isSupabaseConfigured()}
+                        placeholder={isSupabaseConfigured() ? "최소 6자" : "자유 (선택)"}
+                        value={compPassword}
+                        onChange={(e) => setCompPassword(e.target.value)}
+                        className="w-full border rounded-xl px-3 py-2 text-xs"
                       />
                     </div>
                   </div>
@@ -466,9 +648,11 @@ export default function SignUpSimulator({
 
                   <button
                     type="submit"
-                    className="w-full bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold py-3 rounded-xl transition-colors mt-6 shadow-2xs"
+                    disabled={sbLoading}
+                    className="w-full bg-slate-900 hover:bg-slate-800 disabled:bg-slate-300 text-white text-xs font-bold py-3 rounded-xl transition-colors mt-6 shadow-2xs flex items-center justify-center gap-2 cursor-pointer"
                   >
-                    기관 기업 가입 요청 제출 (승인 대기)
+                    {sbLoading && <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>}
+                    <span>기관 기업 가입 요청 제출 (승인 대기)</span>
                   </button>
                 </form>
               )}

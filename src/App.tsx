@@ -34,6 +34,19 @@ import AcademicHome from './components/AcademicHome';
 import AuthenticationPage from './components/AuthenticationPage';
 import GuidePage from './components/GuidePage';
 import { 
+  isSupabaseConfigured, 
+  loadAllFromSupabase, 
+  mapStudentToDB,
+  mapProfessorToDB,
+  mapCompanyToDB,
+  mapRecommendationToDB,
+  mapRecommendationCodeToDB,
+  mapJobToDB,
+  mapJobApplicationToDB,
+  getSupabase,
+  SUPABASE_SQL_DDL_SCRIPT
+} from './lib/supabase';
+import { 
   Sparkles, 
   HelpCircle, 
   BookOpen, 
@@ -76,26 +89,83 @@ export default function App() {
   const [showSignUpDialog, setShowSignUpDialog] = useState(false);
   const [showDemoTips, setShowDemoTips] = useState(true);
 
-  // Load database from localStorage or seed
+  const [sbSyncError, setSbSyncError] = useState<boolean>(false);
+  const [missingTables, setMissingTables] = useState<string[]>([]);
+  const [showSqlDialog, setShowSqlDialog] = useState<boolean>(false);
+
+  // Load database from localStorage or seed with real-time Supabase syncing
   useEffect(() => {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        setStudents(parsed.students || INITIAL_STUDENTS);
-        setProfessors(parsed.professors || INITIAL_PROFESSORS);
-        setCompanies(parsed.companies || INITIAL_COMPANIES);
-        setRecommendations(parsed.recommendations || INITIAL_RECOMMENDATIONS);
-        setRecommendationCodes(parsed.recommendationCodes || INITIAL_RECOMMENDATION_CODES);
-        setJobs(parsed.jobs || INITIAL_JOBS);
-        setApplications(parsed.applications || INITIAL_APPLICATIONS);
-      } catch (err) {
-        console.error('Error loading localStorage state, resetting to seeds', err);
-        resetToDefaults();
+    async function loadInitialData() {
+      let defaultStudents = INITIAL_STUDENTS;
+      let defaultProfessors = INITIAL_PROFESSORS;
+      let defaultCompanies = INITIAL_COMPANIES;
+      let defaultRecommendations = INITIAL_RECOMMENDATIONS;
+      let defaultRecommendationCodes = INITIAL_RECOMMENDATION_CODES;
+      let defaultJobs = INITIAL_JOBS;
+      let defaultApplications = INITIAL_APPLICATIONS;
+
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          defaultStudents = parsed.students || INITIAL_STUDENTS;
+          defaultProfessors = parsed.professors || INITIAL_PROFESSORS;
+          defaultCompanies = parsed.companies || INITIAL_COMPANIES;
+          defaultRecommendations = parsed.recommendations || INITIAL_RECOMMENDATIONS;
+          defaultRecommendationCodes = parsed.recommendationCodes || INITIAL_RECOMMENDATION_CODES;
+          defaultJobs = parsed.jobs || INITIAL_JOBS;
+          defaultApplications = parsed.applications || INITIAL_APPLICATIONS;
+        } catch (err) {
+          console.error('Error parsing localStorage', err);
+        }
       }
-    } else {
-      resetToDefaults();
+
+      // Initialize with local values
+      setStudents(defaultStudents);
+      setProfessors(defaultProfessors);
+      setCompanies(defaultCompanies);
+      setRecommendations(defaultRecommendations);
+      setRecommendationCodes(defaultRecommendationCodes);
+      setJobs(defaultJobs);
+      setApplications(defaultApplications);
+
+      // Now query Supabase if configured
+      if (isSupabaseConfigured()) {
+        try {
+          const res = await loadAllFromSupabase({
+            students: defaultStudents,
+            professors: defaultProfessors,
+            companies: defaultCompanies,
+            recommendations: defaultRecommendations,
+            recommendationCodes: defaultRecommendationCodes,
+            jobs: defaultJobs,
+            applications: defaultApplications,
+          });
+
+          // Update active states with cloud values
+          setStudents(res.students);
+          setProfessors(res.professors);
+          setCompanies(res.companies);
+          setRecommendations(res.recommendations);
+          setRecommendationCodes(res.recommendationCodes);
+          setJobs(res.jobs);
+          setApplications(res.applications);
+
+          if (res.isTableMissing) {
+            setSbSyncError(true);
+            setMissingTables(res.missingTablesList);
+          } else {
+            setSbSyncError(false);
+            setMissingTables([]);
+          }
+        } catch (dbErr) {
+          console.error('Supabase load error:', dbErr);
+          setSbSyncError(true);
+        }
+      }
     }
+
+    loadInitialData();
   }, []);
 
   // Save changes helper
@@ -118,6 +188,24 @@ export default function App() {
       applications: currentApps
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+
+    // Multi-row upsert to live Supabase DB
+    const supabase = getSupabase();
+    if (supabase) {
+      (async () => {
+        try {
+          await supabase.from('students').upsert(currentStudents.map(mapStudentToDB));
+          await supabase.from('professors').upsert(currentProfessors.map(mapProfessorToDB));
+          await supabase.from('companies').upsert(currentCompanies.map(mapCompanyToDB));
+          await supabase.from('recommendations').upsert(currentRecommendations.map(mapRecommendationToDB));
+          await supabase.from('recommendation_codes').upsert(currentCodes.map(mapRecommendationCodeToDB));
+          await supabase.from('jobs').upsert(currentJobs.map(mapJobToDB));
+          await supabase.from('applications').upsert(currentApps.map(mapJobApplicationToDB));
+        } catch (e) {
+          console.error('Supabase synchronized background write failed:', e);
+        }
+      })();
+    }
   };
 
   const resetToDefaults = () => {
@@ -597,13 +685,13 @@ export default function App() {
             
             {/* Platform Logo */}
             <div className="flex items-center gap-2.5 cursor-pointer" onClick={() => setCurrentTab('HOME')}>
-              <div className="bg-indigo-650 text-white p-2 sm:p-2.5 rounded-xl font-black tracking-tight text-xs sm:text-sm select-none shadow-md shadow-indigo-600/10 flex items-center gap-1.5">
+              <div className="bg-slate-900 text-white p-2 sm:p-2.5 rounded-xl font-black tracking-tight text-xs sm:text-sm select-none shadow-md shadow-slate-900/10 flex items-center gap-1.5 border border-slate-700">
                 <Sparkles className="w-4 h-4 text-amber-300 animate-pulse" />
-                <span>Hibrain Matcher Hub</span>
+                <span>TEEDLAB Matcher Hub</span>
               </div>
               <div className="hidden md:block flex-col align-left text-left">
-                <span className="text-[10px] font-extrabold text-indigo-650 bg-indigo-50 px-2 py-0.5 rounded-md uppercase tracking-wider block">Academic Matching</span>
-                <span className="text-[9px] text-slate-404 block -mt-0.5">교수 추천 및 기업 인증 채용 플랫폼</span>
+                <span className="text-[10px] font-extrabold text-indigo-650 bg-indigo-50 px-2 py-0.5 rounded-md uppercase tracking-wider block">TEEDLAB Academic Matcher</span>
+                <span className="text-[9px] text-slate-404 block -mt-0.5">교수 학술 추천 및 공식 매칭 플랫폼</span>
               </div>
             </div>
 
@@ -730,6 +818,110 @@ export default function App() {
 
       {/* Main Content Stage container */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-8 space-y-6">
+
+        {/* Live Supabase Synchronization Alert Bar */}
+        {isSupabaseConfigured() && (
+          <div className={`p-4 rounded-3xl border transition-all text-left ${
+            sbSyncError || missingTables.length > 0
+              ? 'bg-amber-50/70 border-amber-200 text-amber-900 shadow-xs'
+              : 'bg-emerald-50/60 border-emerald-100 text-emerald-950 shadow-2xs'
+          }`}>
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className={`p-2.5 rounded-2xl ${
+                  sbSyncError || missingTables.length > 0
+                    ? 'bg-amber-100 text-amber-700'
+                    : 'bg-emerald-100 text-emerald-700'
+                }`}>
+                  <Fingerprint className="w-5 h-5" />
+                </div>
+                <div className="text-left">
+                  <h4 className="text-sm font-bold flex items-center gap-1.5">
+                    {sbSyncError || missingTables.length > 0 ? (
+                      <>
+                        <span className="inline-flex w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse"></span>
+                        <span>[TEEDLAB] Supabase 테이블 생성 및 동기화 대기 중</span>
+                      </>
+                    ) : (
+                      <>
+                        <span className="inline-flex w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                        <span>[TEEDLAB] Supabase 실시간 클라우드 DB 연동 완료</span>
+                      </>
+                    )}
+                  </h4>
+                  <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+                    {sbSyncError || missingTables.length > 0 ? (
+                      `연결은 성공했으나 ${missingTables.length > 0 ? `[${missingTables.join(', ')}]` : '일부'} 테이블이 Supabase에 생성되지 않았습니다. 동기화를 위해 SQL 설치 코드를 실행해주세요.`
+                    ) : (
+                      '모든 회원 가입, 인턴 공고 승인, 추천서 서명, 채용 지원서 전송이 실제 Supabase 원장에 영구 보관되며 전 직원/학생 대시보드가 완벽하게 동기화됩니다.'
+                    )}
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                {sbSyncError || missingTables.length > 0 ? (
+                  <button
+                    onClick={() => setShowSqlDialog(true)}
+                    className="bg-slate-900 hover:bg-slate-800 text-white rounded-xl px-4 py-2 text-xs font-bold transition-all shadow-md cursor-pointer inline-flex items-center gap-1.5 shrink-0"
+                  >
+                    <span>📜 SQL 설치 코드 복사</span>
+                  </button>
+                ) : (
+                  <span className="text-[11px] font-bold text-emerald-800 bg-emerald-100/80 px-3 py-1.5 rounded-xl shrink-0">
+                    Live ON (동기화 작동중)
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* SQL Installation Dialog Modal */}
+        {showSqlDialog && (
+          <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+            <div className="bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 max-w-2xl w-full max-h-[85vh] flex flex-col shadow-2xl relative animate-scale-up">
+              <button 
+                onClick={() => setShowSqlDialog(false)}
+                className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 font-extrabold text-sm cursor-pointer"
+              >
+                닫기 ✕
+              </button>
+              
+              <div className="space-y-2 text-left mb-4">
+                <span className="text-[10px] uppercase tracking-wider font-extrabold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-md font-mono">가이드 &amp; 데이터베이스 초기화</span>
+                <h3 className="text-lg font-black text-slate-900">Supabase SQL Editor 설치 가이드</h3>
+                <p className="text-xs text-slate-500 leading-normal">
+                  Supabase 대시보드의 <strong>SQL Editor</strong>에서 아래 쿼리를 입력하고 <strong>Run</strong> 버튼을 클릭하십시오. 원격 테이블 구조가 즉시 생성되며, 본 매칭 플랫폼과 연동되어 안전하게 데이터를 보존합니다.
+                </p>
+              </div>
+
+              <div className="bg-slate-950 text-slate-100 rounded-2xl p-4 overflow-y-auto flex-1 font-mono text-xs text-left relative max-h-[40vh] border border-slate-800 select-all">
+                <div className="absolute top-3 right-3 z-10">
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(SUPABASE_SQL_DDL_SCRIPT);
+                      alert('Supabase SQL 설치 스크립트가 클립보드에 복사되었습니다!');
+                    }}
+                    className="bg-indigo-600 hover:bg-indigo-500 text-white text-[10px] font-bold px-3 py-1.5 rounded-lg active:scale-95 transition-all cursor-pointer shadow-md"
+                  >
+                    복사하기
+                  </button>
+                </div>
+                <pre className="pr-16 text-slate-350">{SUPABASE_SQL_DDL_SCRIPT}</pre>
+              </div>
+
+              <div className="mt-5 pt-4 border-t border-slate-150 flex items-center justify-between text-xs">
+                <span className="text-slate-450 font-semibold text-slate-500">티드랩(TEEDLAB) 매칭 서비스 전용 통합 스키마</span>
+                <button
+                  onClick={() => setShowSqlDialog(false)}
+                  className="bg-slate-900 hover:bg-slate-800 text-white font-bold px-5 py-2.5 rounded-xl cursor-pointer"
+                >
+                  준비 완료 (닫기)
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
         
         {/* -------------------- ROUTED PAGES CORE -------------------- */}
 
@@ -1091,8 +1283,9 @@ export default function App() {
       {/* Footer credit section conforming to humble literals */}
       <footer className="bg-white border-t border-slate-200 py-6 text-center text-xs text-slate-400 mt-20">
         <div className="max-w-7xl mx-auto px-4 space-y-1.5 font-medium">
-          <p>Academic Internship Matcher Platform</p>
-          <p className="text-[10px] text-slate-405">지도교수 추천 봉약 시스템 및 보안 기업 관리 모듈 © 2026</p>
+          <p className="font-extrabold text-slate-800">TEEDLAB Academic Matcher Platform</p>
+          <p className="text-[10.5px] text-indigo-600 font-semibold font-mono">Developed & Operated by TEEDLAB (티드랩) | All Rights Reserved</p>
+          <p className="text-[10px] text-slate-405">지도교수 추천 인재 매칭 및 보안 기업 심사 검증 관리 시스템 © 2026 TEEDLAB</p>
         </div>
       </footer>
     </div>

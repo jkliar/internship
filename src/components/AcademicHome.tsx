@@ -95,7 +95,7 @@ export default function AcademicHome({
         <div className="max-w-3xl relative z-10 space-y-6">
           <div className="inline-flex items-center gap-1.5 bg-indigo-500/20 border border-indigo-400/30 px-3/5 py-1 rounded-full text-indigo-300 text-xs font-semibold">
             <Sparkles className="w-3.5 h-3.5" />
-            대학 검증형 고신뢰 매칭 네트워크 (Hibrain Hub)
+            대학 검증형 고신뢰 매칭 네트워크 (TEEDLAB Hub)
           </div>
           
           <div className="space-y-3">
